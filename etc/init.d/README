@@ -1,0 +1,4 @@
+cp irrigationController to /etc/init.d
+
+chmod 755 irrigationController
+ sudo update-rc.d irrigationController defaults

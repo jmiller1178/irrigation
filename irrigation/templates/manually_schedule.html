@@ -1,0 +1,54 @@
+﻿{% load static %}
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Irrigation Control System</title>
+  <link href="{% static 'style.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static '/admin/css/forms.css' %}" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+     
+    <div id="header">
+        <div id="search" ><form action="" method="get"></form></div>
+        <div id="navigation">
+            <ul>
+                  <li><a href="/">Home</a></li>
+                  <li><a href="/manually_schedule/">Schedule</a></li>
+                  <li><a href="/admin/">Admin</a></li>
+                  <li><a href="/m">Mobile</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="content" align="center">
+        <form action="/create_schedule/" method="post">
+        {% csrf_token %}
+        {% if todays_requests %}
+          {% if todays_requests|length > 0 %}
+            <div id=schedule_warning>Attention:  There are {{ todays_requests|length }} scheduled items which will be <b>Cancelled</b> if you manually schedule</div>
+          {% endif %}
+        {% endif %}
+            <table id="schedule_table" width="790" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <th>Zone</th>
+                <th>Enable</th>
+                <th>Minutes</th>
+              </tr>
+            {% if zone_list %}
+              {% for zone in zone_list %}
+              <tr>
+                <td>{{ zone.displayName }}</td>
+                <td><input type="checkbox" name="chkZone_{{ zone.zoneId }}" checked /></td>
+                <td><input name="duration_{{ zone.zoneId }}" value="15" type="text" id="zone_duration_{{ zone.zoneId }}" size="8" style="text-align: right"/>
+              </tr>  
+              {% endfor %}
+            {% endif %}
+              <tr>
+                <td colspan="3">Start Time:&nbsp;<input name="start_time" value={{ current_time_plus_5_minutes }} type="time" id="start_time" size="8" /></td>
+              </tr>  
+              <tr><td><input type="submit" value="Schedule"></td></tr>
+            </table>
+        </form>
+    </div>
+</body>
+

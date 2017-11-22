@@ -1,0 +1,2 @@
+copy activate and web_restart to /usr/local/sbin
+chmod +x for both

@@ -1,0 +1,4 @@
+copy wpa_supplicant.conf to /etc/wpa_supplicant
+
+74:DA:38:0E:1C:9A  mac address for new wifi usb thing
+

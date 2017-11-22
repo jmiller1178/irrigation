@@ -1,0 +1,17 @@
+Django==1.11.7
+RPi.GPIO==0.6.3
+argparse==1.2.1
+django-appconf==1.0.2
+django-cachalot==1.5.0
+django-compressor==2.2
+django-extensions==1.9.7
+django-sass-processor==0.5.5
+django-shell-plus==1.1.7
+djangocms-admin-style==1.2.7
+gunicorn==19.7.1
+pytz==2017.3
+rcssmin==1.0.6
+rjsmin==1.0.12
+six==1.11.0
+typing==3.6.2
+wsgiref==0.1.2

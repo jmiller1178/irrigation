@@ -1,0 +1,21 @@
+# irrigation nginx configuration
+client_max_body_size 500M;
+
+# sprinklesmart
+server {
+    listen 80 default; ## listen for ipv4; this line is default and implied
+
+    root /var/www/data/irrigation/htdocs/;
+    index index.html index.htm;
+
+    # Make site accessible from http://localhost/
+    server_name 192.168.1.125
+				sprinklesmart;
+
+    rewrite_log on;
+    access_log /var/www/data/irrigation/log/accessx.log;
+    error_log /var/www/data/irrigation/log/errorx.log;
+
+    include /var/www/data/irrigation/etc/nginx/locations.conf;
+    client_max_body_size 500M;
+}

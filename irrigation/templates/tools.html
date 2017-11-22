@@ -1,0 +1,45 @@
+﻿{% load static %}
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Irrigation Control System</title>
+<link href="{% static 'style.css' %" rel="stylesheet" type="text/css" />
+<link href="{% static '/admin/css/forms.css' %}" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div id="header">
+<div id="search">
+  <form action="" method="get"><table width="131" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="96"><input name="input" type="text" class="textbox" value="Search"></td>
+    <td width="35">
+      <input name="button" type="submit" class="search" id="button" value="">
+    </td>
+  </tr>
+</table>
+  </form>
+  </div>
+  <div id="navigation">
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/tools/">Tools</a></li>
+</ul>
+</div>
+</div>
+<div id="content" align="center">
+<table id="zones" width="790" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <th>Zone</th>
+    <th>Enable</th>
+    <th>Minutes</th>
+  </tr>
+  <tr>
+    <td>Zone 1</td>
+    <td><input type="checkbox" name="1" checked /></td>
+    <td><input name="duration_1" value="15" type="text" id="id_duration_1" size="8" />
+  </tr>
+</table>
+<h3>Start Time:</h3><input name="start_time" type="text" id="start_time" size="8" />
+
+</div>
+</body>

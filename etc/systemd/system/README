@@ -1,0 +1,2 @@
+copy nginx.service and gunicorn.service to /etc/systemd/system
+chmod +x for both
