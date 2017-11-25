@@ -16,11 +16,13 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="IrrigationController"
 NAME=irrigationController
-HOME=/usr/share/irrigationController
+HOME=/var/www/data/irrigation/irrigation/daemon 
 DAEMON=/usr/bin/python3
 DAEMON_ARGS=
 PIDFILE=/tmp/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
+
+source /var/www/data/irrigation/envs/irrigation/bin/activate
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0

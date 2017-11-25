@@ -72,6 +72,8 @@ class WeekDay(models.Model):
     weekDayId = models.IntegerField(primary_key="True")
     shortName = models.CharField(max_length=10)
     longName = models.CharField(max_length=50)
+    weekDay = models.IntegerField(default=0)
+    
     def __unicode__(self):
         return self.shortName
     
@@ -127,6 +129,7 @@ class RpiGpioRequest(models.Model):
     offDateTime.verbose_name = "Off Date & Time"
 
     status = models.ForeignKey(Status,  db_column="statusId")
+    durationMultiplier = models.FloatField(default = 1.0)
 
     def onDate(self):
         return self.onDateTime.strftime("%Y-%m-%d")
@@ -170,7 +173,8 @@ class IrrigationSchedule(models.Model):
     weekDays.verbose_name_plural = "Week Days"
     duration = models.IntegerField()
     duration.verbose_name = "Duration"    
-
+    sortOrder = models.IntegerField(default=0)
+    
     def displayName(self):
       return self.schedule.displayName + ' ' + self.zone.displayName
     def __unicode__(self):
@@ -199,11 +203,20 @@ class WeatherCondition(models.Model):
         db_table = "weatherCondition"
         verbose_name = "Weather Condition"
         verbose_name_plural = "Weather Conditions"
-   
+        
+    title = models.CharField(max_length=512, default='')
     conditionDateTime = models.DateTimeField()
     conditionDateTime.verbose_name = "Date & Time"
     temperature = models.DecimalField(max_digits=5, decimal_places=2)
+    unitOfMeasure = models.CharField(max_length=10, default="F")
     conditionCode = models.ForeignKey(ConditionCode, db_column="code")
+    forecastDay1 = models.CharField(max_length=512, default='')
+    forecastDay2 = models.CharField(max_length=512, default='')
+    forecastDay3 = models.CharField(max_length=512, default='')
+    forecastDay4 = models.CharField(max_length=512, default='')
+    forecastDay5 = models.CharField(max_length=512, default='')
+    
+    
 
 
 

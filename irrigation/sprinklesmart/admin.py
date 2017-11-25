@@ -38,7 +38,7 @@ admin.site.register(RpiGpio, RpiGpioAdmin)
 
 
 class RpiGpioRequestAdmin(admin.ModelAdmin):
-  list_display = ('rpiGpio',  'onDateTime', 'offDateTime', 'status',)
+  list_display = ('rpiGpio',  'onDateTime', 'offDateTime', 'status', 'durationMultiplier',)
   ordering = ('-id',)
   list_filter = ('status','onDateTime',)
   
@@ -46,8 +46,8 @@ admin.site.register(RpiGpioRequest, RpiGpioRequestAdmin)
 
 
 class IrrigationScheduleAdmin(admin.ModelAdmin):
-    list_display = ('schedule', 'zone', 'duration',)
-    ordering = ('schedule', 'zone',)
+    list_display = ('schedule', 'zone', 'duration','sortOrder',)
+    ordering = ('schedule', 'sortOrder', 'zone',)
     list_filter = ('schedule',)
     filter_horizontal = ('weekDays',)
     
@@ -75,4 +75,9 @@ class WeatherConditionAdmin(admin.ModelAdmin):
 admin.site.register(WeatherCondition, WeatherConditionAdmin)
 
 admin.site.register(IrrigationSystem)
-admin.site.register(WeekDay)
+
+class WeekDayAdmin(admin.ModelAdmin):
+    list_display = ('longName', 'shortName', 'weekDay',)
+    ordering = ('weekDay',)
+    
+admin.site.register(WeekDay, WeekDayAdmin)

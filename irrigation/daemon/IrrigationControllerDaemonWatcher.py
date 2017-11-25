@@ -14,7 +14,8 @@ import subprocess
 
 class IrrigationControllerDaemonWatcher(Daemon):
     def run(self):
-        logging.basicConfig(filename='/var/log/IrrigationControllerWatcher.log',level=logging.INFO,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        logging.basicConfig(filename='/var/www/data/irrigation/log/IrrigationControllerWatcher.log',level=logging.INFO,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        
         logging.info("IrrigationControllerDaemonWatcher.py Starting Up")
 
         minute_counter = 0
@@ -28,7 +29,7 @@ class IrrigationControllerDaemonWatcher(Daemon):
             time.sleep(60)   
 
 if __name__ == "__main__":
-    daemon = IrrigationControllerDaemonWatcher('/var/run/IrrigationControllerWatcher.pid')
+    daemon = IrrigationControllerDaemonWatcher('/var/www/data/irrigation/run/IrrigationControllerWatcher.pid')
     
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:

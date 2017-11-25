@@ -144,3 +144,5 @@ TEMPLATES = [
         },
     },
 ]
+INTERNET_CHECK_URL='http://www.yahoo.com'
+WEATHER_URL="https://query.yahooapis.com/v1/public/yql?"

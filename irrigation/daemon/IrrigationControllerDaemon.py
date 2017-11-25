@@ -13,14 +13,13 @@
 # 7/7/2016 JRM - changed to use yahoo weather API yql since they stopped supporting the pywapi call
 #
 import sqlite3 as lite
-from daemon import Daemon
+import daemon
 import time
 import sys
 from datetime import datetime, date, timedelta
 import logging
 import uuid
 import RPi.GPIO as GPIO
-import pywapi
 import urllib2
 import urllib
 import json
@@ -385,15 +384,16 @@ def CheckRpiGpioRequest_ON(con):
         con.commit()         
             
 
-class IrrigationControllerDaemon(Daemon):
+class IrrigationControllerDaemon(daemon):
     def run(self):
-        logging.basicConfig(filename='/var/log/IrrigationController.log',level=logging.INFO,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        logging.basicConfig(filename='/var/www/data/irrigation/log/IrrigationController.log',level=logging.INFO,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         logging.info("IrrigationControllerDaemon.py Sqlite Version Starting Up")
 
         second_counter = 0
         minute_counter = 0
 
-        con = lite.connect('/usr/share/irrigationController/irrigationController.db', 60)
+        con = lite.connect('/var/www/data/irrigation/irrigation/db/irrigation.db', 60)
+        
         # 7/1/2013 JRM - check for internet availability before trying to read the weather conditions    
         if InternetIsAvailable('http://www.yahoo.com'):
             RecordCurrentWeatherConditions(con) 
@@ -412,7 +412,7 @@ class IrrigationControllerDaemon(Daemon):
         con.close()
 
         while True:
-            con = lite.connect('/usr/share/irrigationController/irrigationController.db', 60)
+            con = lite.connect('/var/www/data/irrigation/irrigation/db/irrigation.db', 60)
             # sleep for 5 seconds
             time.sleep(5)        
             second_counter += 5
@@ -455,20 +455,20 @@ class IrrigationControllerDaemon(Daemon):
 
 
 if __name__ == "__main__":
-    daemon = IrrigationControllerDaemon('/var/run/IrrigationController.pid')
-    con = lite.connect('/usr/share/irrigationController/irrigationController.db', 60)
+    irrigation_daemon = IrrigationControllerDaemon('/var/www/data/irrigation/run/IrrigationController.pid')
+    con = lite.connect('/var/www/data/irrigation/irrigation/db/irrigation.db', 60)
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
             TurnAllOutputsOff(con)
-            daemon.start()
+            irrigation_daemon.start()
         elif 'stop' == sys.argv[1]:
             # 2/13/2013 JRM - turn all outputs off during stop
             TurnAllOutputsOff(con)
-            daemon.stop()
+            irrigation_daemon.stop()
         elif 'restart' == sys.argv[1]:
             # 2/13/2013 JRM - turn all outputs off during restart
             TurnAllOutputsOff(con)
-            daemon.restart()
+            irrigation_daemon.restart()
         else:
             print "Unknown command"
             sys.exit(2)

@@ -25,7 +25,7 @@ def OutputCommand(ioid, command):
 
 def TurnAllOutputsOff():
     sql = "SELECT * FROM rpiGpio;"
-    con = lite.connect('/usr/share/irrigationController/irrigationController.db', 60)
+    con = lite.connect('/var/www/data/irrigation/irrigation/db/irrigation.db', 60)
     #cur = con.cursor(mdb.cursors.DictCursor)
     con.row_factory = lite.Row
     cur = con.cursor() 
@@ -40,7 +40,7 @@ def TurnAllOutputsOff():
     
 class RpiGpioDaemon(Daemon):
     def run(self):
-        logging.basicConfig(filename='/var/log/rpiGpioDaemon.log',level=logging.INFO,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        logging.basicConfig(filename='/var/www/data/irrigration/log/rpiGpioDaemon.log',level=logging.INFO,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         logging.info("rpiGpioDaemon.py Sqlite Version Starting Up")
         
         #turn off all outputs to start
@@ -71,7 +71,7 @@ class RpiGpioDaemon(Daemon):
             # run forever  - wakes up every 10 seconds to re run the above query    
             # Open database connection - the 60 is timeout seconds in case the database is locked by another process
             #con = mdb.connect("localhost","icappuser","icappuser","irrigationcontroller" )
-            con = lite.connect('/usr/share/irrigationController/irrigationController.db', 60)
+            con = lite.connect('/var/www/data/irrigration/irrigation/db/irrigation.db', 60)
             #cur = con.cursor(mdb.cursors.DictCursor)
             con.row_factory = lite.Row
             cur = con.cursor() 

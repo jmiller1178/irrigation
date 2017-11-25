@@ -2,4 +2,9 @@ envs/
 htdocs/
 log/
 run/
+irrigation/daemon/.cache/
+irrigation/daemon/.local/
+*.py[cod]
+
+
 
