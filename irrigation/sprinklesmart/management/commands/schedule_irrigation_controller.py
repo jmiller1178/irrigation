@@ -6,14 +6,17 @@ from django.shortcuts import get_object_or_404
 import pytz
 from datetime import datetime, date, timedelta
 from sprinklesmart.models import RpiGpioRequest, Schedule, WeekDay, Status, WeatherCondition
+from django.db.models import Q
 
 class Command(BaseCommand):
     help = 'Schedule Irrigation Controller Events'
     
     def handle(self, *args, **options):
+        active_status = get_object_or_404(Status, pk=4) # 4 is active
+        pending_status = get_object_or_404(Status, pk=1) # 1 is pending
         # Let's start by checking if ANYTHING is scheduled for today because, if there is, then we shouldn't
         # have to execute any of the code below, right??
-        requests = RpiGpioRequest.objects.filter(status__in=[1,4], onDateTime__contains=date.today())
+        requests = RpiGpioRequest.objects.filter(Q(status=active_status) | Q(status=pending_status), onDateTime__contains=date.today())
         
         if requests.count() ==0:
             # there is nothing scheduled for today so do the scheduling process
@@ -25,17 +28,19 @@ class Command(BaseCommand):
             
             # retrieve IrrigationSchedule records for this day of the week and for the above Schedule 
             current_time = datetime.now(eastern)
+            print current_time
             
             # find the WeekDay object for today
             week_day = get_object_or_404(WeekDay, weekDay=current_time.weekday())
             pending_status = get_object_or_404(Status, pk=1)
             
             for schedule in enabled_schedules:
+                print schedule
                 schedule_time=datetime(current_time.year, current_time.month, current_time.day, schedule.startTime.hour, schedule.startTime.minute, tzinfo=eastern)
                 if schedule_time > current_time:
                     delta_time=schedule_time-current_time
                     minutes_in_future = (delta_time.seconds * sprinkle_smart_multiplier) / 60
-                    
+                    print minutes_in_future
                     if minutes_in_future < 60:
                         # we're less than an hour away from scheduled start time so need to stup the RpiGpioRequests per that schedule
                         irrigation_schedules = schedule.irrigationschedule_set.filter(weekDays=week_day).order_by('sortOrder')

@@ -1,4 +1,5 @@
 import os
+from utils.logging_filters import skip_suspicious_operations
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -146,3 +147,51 @@ TEMPLATES = [
 ]
 INTERNET_CHECK_URL='http://www.yahoo.com'
 WEATHER_URL="https://query.yahooapis.com/v1/public/yql?"
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        },
+        # Define filter
+        'skip_suspicious_operations': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': skip_suspicious_operations,
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false', 'skip_suspicious_operations'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filters': ['skip_suspicious_operations'],
+            'filename': '/var/www/data/irrigation/log/django.log'
+        }
+    },
+    'loggers': {
+        'sprinklesmart': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'sprinklesmart': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        }
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'ERROR',
+    }
+}

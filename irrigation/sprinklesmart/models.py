@@ -40,11 +40,10 @@ class IrrigationSystem(models.Model):
         verbose_name = "Irrigation System"
         verbose_name_plural = "Irrigation System"
 
-    #id = models.IntegerField(primary_key="True", db_column="id")
-    systemState = models.IntegerField(db_column="system_state")
-
+    systemState = models.BooleanField(db_column="system_state")
+    
     def __unicode__(self):
-        if self.systemState == 1:
+        if self.systemState == True:
             return "Enabled"
         else:
             return "Disabled"
@@ -76,6 +75,7 @@ class WeekDay(models.Model):
     
     def __unicode__(self):
         return self.shortName
+    
     
 class Schedule(models.Model):
     class Meta:

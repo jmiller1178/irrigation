@@ -50,7 +50,7 @@
         <td valign="top"><div id="todays_schedule">Status</div>
           <table cellspacing="0" cellpadding="0">
             <tr>
-              {% if system_enabled.systemState == 1 %}
+              {% if system_enabled.systemState == True %}
                 <td align="left"><img src="{% static 'images/greenlight.jpg' %}" alt="ON" width=19 height=19 /> System Enabled</td>
               {% else %}
                 <td align="left"><img src="{% static 'images/redlight.jpg' %}" alt="OFF" width=15 height=15 /> System Disabled!</td>
