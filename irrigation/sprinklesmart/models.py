@@ -5,7 +5,6 @@ from django.db import models
 from django.utils import timezone
 from django.contrib import admin
 from datetime import datetime, date, timedelta
-import pytz
 
 class Zone(models.Model):
     class Meta:
@@ -149,10 +148,10 @@ class RpiGpioRequest(models.Model):
 
     def remaining(self):
 		
-        if datetime.now(pytz.utc) > self.offDateTime:
+        if datetime.now() > self.offDateTime:
             remaining = 0
-        elif datetime.now(pytz.utc) > self.onDateTime:
-          remaining = ((self.offDateTime - datetime.now(pytz.utc)).seconds / 60) + 1
+        elif datetime.now() > self.onDateTime:
+          remaining = ((self.offDateTime - datetime.now()).seconds / 60) + 1
         else:
           remaining =(self.offDateTime - self.onDateTime).seconds / 60
         return remaining

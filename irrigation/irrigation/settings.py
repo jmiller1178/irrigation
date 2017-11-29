@@ -105,13 +105,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'US/Eastern'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -188,7 +188,13 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': False,
-        }
+        },
+        'sprinklesmart.management':{
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        
     },
     'root': {
         'handlers': ['file'],

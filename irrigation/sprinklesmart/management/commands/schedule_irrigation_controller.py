@@ -3,7 +3,6 @@ from django.core.management.base import BaseCommand, CommandError
 import urllib2
 from sprinklesmart.api.weather import WeatherAPI
 from django.shortcuts import get_object_or_404
-import pytz
 from datetime import datetime, date, timedelta
 from sprinklesmart.models import RpiGpioRequest, Schedule, WeekDay, Status, WeatherCondition
 from django.db.models import Q
@@ -23,11 +22,10 @@ class Command(BaseCommand):
             
             # look for active schedule(s) with a start time within the next hour
             enabled_schedules = Schedule.objects.filter(enabled=True)
-            eastern = pytz.timezone('US/Eastern')
             sprinkle_smart_multiplier = self.get_sprinkle_smart_multiplier()
             
             # retrieve IrrigationSchedule records for this day of the week and for the above Schedule 
-            current_time = datetime.now(eastern)
+            current_time = datetime.now()
             print current_time
             
             # find the WeekDay object for today
@@ -44,7 +42,7 @@ class Command(BaseCommand):
                     if minutes_in_future < 60:
                         # we're less than an hour away from scheduled start time so need to stup the RpiGpioRequests per that schedule
                         irrigation_schedules = schedule.irrigationschedule_set.filter(weekDays=week_day).order_by('sortOrder')
-                        zone_start_time = datetime(current_time.year, current_time.month, current_time.day, schedule.startTime.hour, schedule.startTime.minute,tzinfo=pytz.UTC)
+                        zone_start_time = datetime(current_time.year, current_time.month, current_time.day, schedule.startTime.hour, schedule.startTime.minute)
                         
                         for irrigation_schedule in irrigation_schedules:
                             # create RpiGpioRequest records for today
@@ -71,7 +69,7 @@ class Command(BaseCommand):
     def get_sprinkle_smart_multiplier(self):
         multiplier = 1.0
         
-        weather_conditions=WeatherCondition.objects.filter(conditionDateTime__gt=datetime.now(pytz.UTC)-timedelta(days=2))
+        weather_conditions=WeatherCondition.objects.filter(conditionDateTime__gt=datetime.now()-timedelta(days=2))
         total_count = weather_conditions.count()
         rain_count = 0
         for weather_condition in weather_conditions:

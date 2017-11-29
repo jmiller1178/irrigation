@@ -4,7 +4,6 @@ import urllib2
 from sprinklesmart.api.weather import WeatherAPI
 from sprinklesmart import models
 from django.shortcuts import get_object_or_404
-import pytz
 
 class Command(BaseCommand):
     help = 'Record Current Weather Conditions'

@@ -2,5 +2,6 @@
 
 source /var/www/data/irrigation/envs/irrigation/bin/activate
 cd /var/www/data/irrigation/irrigation
-python manage.py schedule_irrigation_controller
+python manage.py process_rpigpio_requests
+
 
