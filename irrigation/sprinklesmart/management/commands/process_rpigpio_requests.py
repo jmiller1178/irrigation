@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from datetime import datetime, date, timedelta
 from sprinklesmart.models import RpiGpioRequest, Schedule, WeekDay, Status, WeatherCondition, IrrigationSystem
 from sprinklesmart.gpio.controller import OutputCommand, Commands, TurnAllOutputsOff
-from django.db.models import Q
+from django.db.models import Q, Min
 import logging
 
 logger = logging.getLogger(__name__)
@@ -51,6 +51,9 @@ class Command(BaseCommand):
                     pending_request.status = active_status
                     logger.debug("pending_request {0}".format(pending_request))
                     pending_request.save()
+            else:
+                pending_request = RpiGpioRequest.objects.filter(status=pending_status).order_by('onDateTime').first()
+                logger.debug("next pending_request {0}".format(pending_request))
         else:
             logger.debug("Irrigation System is Disabled")
             TurnAllOutputsOff()
