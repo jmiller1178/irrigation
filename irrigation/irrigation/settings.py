@@ -2,8 +2,11 @@ import os
 from utils.logging_filters import skip_suspicious_operations
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.abspath(os.path.split(os.path.dirname(__file__))[0])
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(PROJECT_DIR)
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -16,7 +19,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '192.168.1.125']
 
-STATIC_ROOT = '/var/www/data/irrigation/htdocs/static'
 
 STATIC_URL = '/static/'
 

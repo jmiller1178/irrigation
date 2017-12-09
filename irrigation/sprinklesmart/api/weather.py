@@ -7,8 +7,6 @@ import json
 from datetime import datetime, date, timedelta
 import time
 from dateutil import parser
-import pytz
-from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +26,7 @@ class WeatherAPI(object):
 		title = jsonResponse['query']['results']['channel']['item']['title']
 	
 		condition_time_stamp = jsonResponse['query']['results']['channel']['item']['condition']['date']
-		condition_date_time = timezone.make_aware(parser.parse(condition_time_stamp), pytz.UTC)
+		condition_date_time = parser.parse(condition_time_stamp, ignoretz=True)
 				
 		weather_code = int(jsonResponse['query']['results']['channel']['item']['condition']['code'])
 		
