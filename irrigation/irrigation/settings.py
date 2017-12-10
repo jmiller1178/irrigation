@@ -17,7 +17,7 @@ SECRET_KEY = '#va$&%c7om&k5=hemp$)@#l%(9-ki#f-(==la6tu(@5kp)1m@$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '192.168.1.125']
+ALLOWED_HOSTS = ['localhost', '192.168.1.125', '192.168.1.126',]
 
 
 STATIC_URL = '/static/'
@@ -76,10 +76,6 @@ WSGI_APPLICATION = 'irrigation.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db/irrigation.db'),
-    }
 }
 
 
@@ -203,3 +199,5 @@ LOGGING = {
         'level': 'ERROR',
     }
 }
+
+from local_settings import *
