@@ -199,5 +199,4 @@ LOGGING = {
         'level': 'ERROR',
     }
 }
-
 from local_settings import *
