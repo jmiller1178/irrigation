@@ -34,10 +34,16 @@ def index(request):
 	current_date = datetime.now()
 	todays_requests = RpiGpioRequest.objects.filter(status__in=[1,4], onDateTime__contains=date.today())
 
-	current_weather = WeatherCondition.objects.order_by('-id')[0]
-	
-	system_enabled = IrrigationSystem.objects.order_by('-id')[0]
-	
+	if WeatherCondition.objects.all().count() > 0:
+		current_weather = WeatherCondition.objects.order_by('-id')[0]
+	else:
+		current_weather = None
+		
+	if IrrigationSystem.objects.all().count() > 0:
+		system_enabled = IrrigationSystem.objects.order_by('-id')[0]
+	else:
+		system_enabled = False
+		
 	return render(request, 
 				'index.html', 
 				{
