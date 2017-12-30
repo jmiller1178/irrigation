@@ -19,6 +19,7 @@ from django.conf import settings
 from django.db.models import Max
 from os.path import exists 
 from django.views.decorators.csrf import ensure_csrf_cookie
+from sprinklesmart.gpio.controller import OutputCommand, Commands
 
 # main browser based view for the irrigation website
 # /index.html
@@ -172,23 +173,22 @@ def cancel_all_current_requests():
       rpiGpioRequest.save()
 
 
-def turn_zone_on(zoneId,  duration):
-    # read the Zone info from the database
-    zone = get_object_or_404(Zone, pk=zoneId)
-    # set the start time for 15 seconds into the future
-    current_time_plus_1_minutes = (datetime.now() + timedelta(seconds=15)).strftime("%H:%M")
-    startTime =  datetime.strptime(str(date.today()) + ' ' + current_time_plus_1_minutes, "%Y-%m-%d %H:%M")
+def turn_zone_on(zoneId):
+	# read the Zone info from the database
+	zone = get_object_or_404(Zone, pk=zoneId)
+	rpiGpio = RpiGpio.objects.get(zone=zone)
+	ioid = rpiGpio.gpioNumber
 
-    # set the end time for the start time + the duration from the from
-    endTime = startTime + timedelta(minutes=duration)
-    # read the RpiGpio object
-    rpiGpio = RpiGpio.objects.get(zone=zone)
+	OutputCommand(ioid, zone, Commands.ON)
 
-    # instantiate a Status of "New"
-    new_status = get_object_or_404(Status, pk=1)
-    # instantiate and fill up an RpiGpioRequest to turn on the zone and save it
-    rpiGpioRequest = RpiGpioRequest.objects.create(rpiGpio=rpiGpio, status=new_status, onDateTime=startTime, offDateTime=endTime)
-    rpiGpioRequest.save()
+
+def turn_zone_off(zoneId):
+	# read the Zone info from the database
+	zone = get_object_or_404(Zone, pk=zoneId)
+	rpiGpio = RpiGpio.objects.get(zone=zone)
+	ioid = rpiGpio.gpioNumber
+
+	OutputCommand(ioid, zone, Commands.OFF)
 
 
 def zone_toggle(request, zoneId):
@@ -197,20 +197,15 @@ def zone_toggle(request, zoneId):
 
     # check to see if it is in an ON state
     if zone.currentState() == "ON":
-        turn_all_outputs_off()
-        # it is ON so use the irrigation.rpiGpio.ZoneToggle to immediately turn it OFF
-        # connectionString = settings.DATABASES['default']['NAME']
-        # irrigation.rpiGpio.ZoneToggle(int(zoneId),connectionString)
-        # cancel any outstanding request to clear the queue
-        cancel_all_current_requests()
-
+		turn_zone_off(zoneId)
+       
     # check to see if it is in an OFF state
     if zone.currentState() == "OFF":    
         # it is OFF so create an RpiGpioRequest record to have it turned on
         if request.method == 'POST':
-            cancel_all_current_requests()
-            duration = int(request.POST['duration'])
-            turn_zone_on(zoneId,  duration)
+            #cancel_all_current_requests()
+            #duration = int(request.POST['duration'])
+            turn_zone_on(zoneId)
  
 
     return HttpResponseRedirect('/')
