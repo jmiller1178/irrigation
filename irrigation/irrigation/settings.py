@@ -17,7 +17,7 @@ SECRET_KEY = '#va$&%c7om&k5=hemp$)@#l%(9-ki#f-(==la6tu(@5kp)1m@$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '192.168.1.125', '192.168.1.126',]
+ALLOWED_HOSTS = ['localhost', '192.168.1.125', '192.168.1.126','192.168.1.127',]
 
 
 STATIC_URL = '/static/'
