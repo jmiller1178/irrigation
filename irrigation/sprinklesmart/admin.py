@@ -13,9 +13,9 @@ from models import IrrigationSystem
 from models import ConditionCode, WeatherCondition
 
 class ZoneAdmin(admin.ModelAdmin):
-    list_display = ('displayName', 'locationName', 'enabled', 'is_on',)
-    ordering = ('zoneId',)
-    fields = ('shortName', 'displayName', 'locationName', 'enabled', 'is_on', )
+    list_display = ('displayName', 'locationName', 'enabled', 'is_on', 'visible','sortOrder',)
+    ordering = ('sortOrder',)
+    fields = ('shortName', 'displayName', 'locationName', 'enabled', 'is_on', 'visible','sortOrder',)
     readonly_fields = ('is_on',)
 
 admin.site.register(Zone, ZoneAdmin)

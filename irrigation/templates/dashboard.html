@@ -6,26 +6,8 @@
 <link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <div id="header">
-      <div id="search" ><form action="" method="get"></form></div>
-      <div id="navigation">
-          <ul>
-              <li><a href="/">Home</a></li>
-              <li><a href="/manually_schedule/">Schedule</a></li>
-              <li><a href="/admin/">Admin</a></li>
-              <li><a href="/m">Mobile</a></li>
-          </ul>
-      </div>
-    </div>
-    <div id="main_image"></div>
     <div id="content">
       <table width="790" border="1" cellspacing="0" cellpadding="0">
-      <tr>
-        <td colspan="2">
-        <h1>Welcome to Sprinkle Smart</h1>
-        
-        </td>
-      </tr>
       <tr>
         <td valign="top"><div id="todays_schedule">Current Weather</div>
           <table cellspacing="0" cellpadding="0">
@@ -68,44 +50,25 @@
         <a href="/rpi_gpio_request_cancel_all" ><img src="{% static 'images/cancel_button.jpg' %}" alt="cancel all" /></a>
           <table cellspacing="0" cellpadding="0">
             
-            {% if todays_requests %}
-              {% for request in todays_requests %}
+            {% if active_request %}
                 <tr>
                   <td align="left"><a href="/zone_control/{{ request.rpiGpio.zone.zoneId }}" >{{ request.rpiGpio.zone.shortName }}</a></td>
-                  <td>{{ request.onTime }}</td>
-                  <td>{{ request.offTime }}</td>
-                  <td>{{ request.duration }}</td>
-                  <td>{{ request.remaining }}</td>
-                  {% if request.rpiGpio.zone.is_on == True %}
-                    <td><a href="/rpi_gpio_request_cancel/{{ request.id }}" ><img src="{% static 'images/cancel_button.jpg' %}" alt="cancel" /></a></td>
+                  <td>{{ active_request.onTime }}</td>
+                  <td>{{ active_request.offTime }}</td>
+                  <td>{{ active_request.duration }}</td>
+                  <td>{{ active_request.remaining }}</td>
+                  {% if active_request.rpiGpio.zone.is_on == True %}
+                    <td><a href="/rpi_gpio_request_cancel/{{ active_request.id }}" ><img src="{% static 'images/cancel_button.jpg' %}" alt="cancel" /></a></td>
                   {% else %}
                     <td>&nbsp;</td>
                   {% endif %}  
               </tr>
-              {% endfor %}
             {% else %}
               <tr><td>Nothing scheduled for today</td></tr>
             {% endif %}
           </table>
         </td>
-        <td><div id="zone_status" valign="top">Zone Status</div>
-          <table cellspacing="0" cellpadding="0">
-            {% if zone_list %}
-              {% for zone in zone_list %}
-                <tr>
-                  <td><a href="/zone_control/{{ zone.zoneId }}" >{{ zone.displayName }}</a></td>
-                  {% if zone.currentState == "ON" %}
-                    <td align="center"><img src="{% static 'images/greenlight.jpg' %}" alt="ON" width=19 height=19 /></td>
-                  {% else %}
-                    <td align="center"><img src="{% static 'images/redlight.jpg' %}" alt="OFF" width=15 height=15 /></td>
-                  {% endif %}
-                </tr>
-              {% endfor %}
-            {% else %}
-              <tr><td>No Zone Info Available</td></tr>
-            {% endif %}
-          </table>
-        </td>
+        
       </tr>
       </table>
     </div>

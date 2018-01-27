@@ -20,31 +20,26 @@ from django.db.models import Max
 from os.path import exists 
 from django.views.decorators.csrf import ensure_csrf_cookie
 from sprinklesmart.gpio.controller import OutputCommand, Commands
+from django.shortcuts import get_object_or_404
 
 # main browser based view for the irrigation website
 # /index.html
 def index(request):
-	pid_file_name='/var/run/IrrigationController.pid'
-
-	if exists(pid_file_name):
-		daemon_status = "ON"
-	else:
-		daemon_status = "OFF"
-
-	zone_list = Zone.objects.all()
+	zone_list = Zone.objects.filter(visible=True)
 	current_date = datetime.now()
 	todays_requests = RpiGpioRequest.objects.filter(status__in=[1,4], onDateTime__contains=date.today())
 
-	if WeatherCondition.objects.all().count() > 0:
-		current_weather = WeatherCondition.objects.order_by('-id')[0]
-	else:
-		current_weather = None
-		
-	if IrrigationSystem.objects.all().count() > 0:
-		system_enabled = IrrigationSystem.objects.order_by('-id')[0]
-	else:
-		system_enabled = False
-		
+	# latest WeatherCondtion
+	current_weather = WeatherCondition.objects.order_by('-id')[0]
+	
+	# 1st look for the IrrigationSystem.systemState	
+	irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+	system_enabled = irrigation_system.systemState
+	
+	# next look for the RpiGpio associated to system enabling - this one will enable the 24VAC to the valve control relays
+	system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
+	twentyfour_vac_enabled = system_enabled_rpi_gpio.zone.is_on
+	
 	return render(request, 
 				'index.html', 
 				{
@@ -52,12 +47,30 @@ def index(request):
 				  'current_date' : current_date,
 				  'todays_requests' : todays_requests,
 				  'current_weather' : current_weather,
-				  'daemon_status' : daemon_status,
-				  'system_enabled' : system_enabled
+				  'system_enabled' : system_enabled,
+				  'twentyfour_vac_enabled' : twentyfour_vac_enabled,
 				})
                               
                               
+def dashboard(request):
+	active_status = get_object_or_404(Status, pk=4) 
+	
+	# this is the GPIO which enables 24VAC to the valve control relays 	
+	system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
+	twentyfour_vac_enabled = system_enabled_rpi_gpio.zone.is_on
 
+	# get the current weatherconditions
+	current_weather = WeatherCondition.objects.order_by('-id')[0]
+	irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+	system_enabled = irrigation_system.systemState
+	active_request = RpiGpioRequest.objects.get(status=active_status)
+	return render(request, 
+				'dashboard.html', 
+				{
+				  'current_weather' : current_weather,
+				  'system_enabled' : system_enabled,
+				  'active_request' : active_request,
+				})
 
 # web browser single zone control view
 # /zone_control.html

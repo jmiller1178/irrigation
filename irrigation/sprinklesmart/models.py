@@ -17,7 +17,8 @@ class Zone(models.Model):
     displayName = models.CharField(max_length=255)
     displayName.verbose_name = "Display Name"
     enabled = models.BooleanField(default = True)
-      
+    visible = models.BooleanField(default = True)
+    sortOrder = models.IntegerField(default=0, blank=False)  
     is_on = models.BooleanField(default = False)
     is_on.verbose_name = "Current State"
 
