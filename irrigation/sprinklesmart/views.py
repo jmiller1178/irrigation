@@ -25,7 +25,7 @@ from django.shortcuts import get_object_or_404
 # main browser based view for the irrigation website
 # /index.html
 def index(request):
-	zone_list = Zone.objects.filter(visible=True)
+	zone_list = Zone.objects.filter(visible=True, enabled=True)
 	current_date = datetime.now()
 	todays_requests = RpiGpioRequest.objects.filter(status__in=[1,4], onDateTime__contains=date.today())
 
@@ -89,7 +89,7 @@ def zone_control(request, zoneId):
 # /mobile/mobile_index.html
 @ensure_csrf_cookie
 def mobile_index(request):
-    zone_list = Zone.objects.all()
+    zone_list = Zone.objects.filter(visible=True, enabled=True)
     active_request = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
     return render(request,
 				'mobile/mobile_index.html', 
@@ -115,7 +115,7 @@ def mobile_zone_control(request, zoneId):
 # /manually_schedule.html
 @ensure_csrf_cookie
 def manually_schedule(request):
-    zone_list = Zone.objects.all()
+    zone_list = Zone.objects.filter(visible=True, enabled=True)
     todays_requests = RpiGpioRequest.objects.filter(status=1, onDateTime__contains=date.today())
     current_time_plus_5_minutes = (datetime.now() + timedelta(minutes=5)).strftime("%H:%M")
                                
@@ -139,7 +139,7 @@ def create_schedule(request):
       cancel_all_current_requests()
       
       # need a list of the zones  
-      zone_list = Zone.objects.all()
+      zone_list = Zone.objects.filter(visible=True, enabled=True)
       # retrieve the start time from the form field "start_time" and tack on today's date
       startTime =  datetime.strptime(str(date.today()) + ' ' + request.POST['start_time'], "%Y-%m-%d %H:%M")
       # we need a status object of "New" instantiated 

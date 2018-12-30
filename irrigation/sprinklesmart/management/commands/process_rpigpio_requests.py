@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.shortcuts import get_object_or_404
 from datetime import datetime, date, timedelta
-from sprinklesmart.models import RpiGpio, RpiGpioRequest, Schedule, WeekDay, Status, WeatherCondition, IrrigationSystem
+from sprinklesmart.models import *
 from sprinklesmart.gpio.controller import *
 from django.db.models import Q, Min
 import logging
@@ -14,7 +14,10 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
 		logger.debug("process_rpigpio_request invoked")
-
+		active_status = get_object_or_404(Status, pk=4) # 4 is active
+		pending_status = get_object_or_404(Status, pk=1) # 1 is pending
+		complete_status = get_object_or_404(Status, pk=2) # 2 is complete
+		
 		# this is the GPIO which enables 24VAC to the valve control relays 	
 		system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
 
@@ -31,8 +34,6 @@ class Command(BaseCommand):
 			Turn24VACOff()
 			# turn off all other outputs
 			TurnAllOutputsOff()
-			# turn off Irrigation System Active
-			TurnIrrigationSystemActiveOff()
 		else:
 			# otherwise
 			# turn on 24VAC
@@ -43,10 +44,6 @@ class Command(BaseCommand):
 		if system_enabled and twentyfour_vac_enabled:
 			# system is completely enabled 
 			logger.debug("Irrigation System is Enabled")
-            
-			active_status = get_object_or_404(Status, pk=4) # 4 is active
-			pending_status = get_object_or_404(Status, pk=1) # 1 is pending
-			complete_status = get_object_or_404(Status, pk=2) # 2 is complete
 			
 			current_time = datetime.now()
 			match_time = datetime(current_time.year, current_time.month, current_time.day, current_time.hour, current_time.minute, second=0, microsecond=0)
@@ -73,6 +70,7 @@ class Command(BaseCommand):
 					pending_request.status = active_status
 					pending_request.save()
 					TurnIrrigationSystemActiveOn()
+					
 			else:
 				pending_request = RpiGpioRequest.objects.filter(status=pending_status).order_by('onDateTime').first()
 				logger.debug("next pending_request {0}".format(pending_request))
@@ -80,9 +78,6 @@ class Command(BaseCommand):
 			logger.debug("Irrigation System is Disabled")
 			TurnAllOutputsOff()
 			# cancel all requests which are active or pending
-			active_status = get_object_or_404(Status, pk=4) # 4 is active
-			pending_status = get_object_or_404(Status, pk=1) # 1 is pending
-			cancel_status = get_object_or_404(Status, pk=3) # 3 is cancel
 			open_requests = RpiGpioRequest.objects.filter(Q(status=active_status) | Q(status=pending_status))
 			if open_requests.count() > 0:
 				for request in open_requests:

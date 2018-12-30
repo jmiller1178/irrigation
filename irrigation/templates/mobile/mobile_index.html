@@ -9,18 +9,13 @@
 <div id="container">
 {% if zone_list %}
   {% for zone in zone_list %}
-  <a href="/m/mobile_zone_control/{{ zone.zoneId }}" 
-   {% if zone.currentState == "ON" %}
-    class="on_button" >
-      {% if active_request %}
-        {% for request in active_request %}
-          {{ request.rpiGpio.zone.displayName }} - {{ request.remaining }} mins
-        {% endfor %}
-      {% endif %}
-   {% else %}
-    class="off_button" >   {{ zone.displayName }}
-   {% endif %}
-</a><br>
+	  <a href="/m/mobile_zone_control/{{ zone.zoneId }}" 
+	   {% if zone.currentState == "ON" %}
+			class="on_button">{{ zone.displayName }}
+	   {% else %}
+			class="off_button">{{ zone.displayName }}
+	   {% endif %}
+	</a><br>
  {% endfor %}
 {% else %}
   No Zone Info Available<br>

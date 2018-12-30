@@ -27,7 +27,7 @@ def OutputCommand(ioid, zone, command):
         GPIO.output(ioid, GPIO.HIGH)
         zone.is_on = True
         zone.save()
-
+     
     if command == Commands.OFF:
         GPIO.output(ioid, GPIO.LOW)
         zone.is_on = False
@@ -52,8 +52,29 @@ def Turn24VACOn():
 	
 def TurnIrrigationSystemActiveOff():
 	irrigation_system_active_rpi_gpio = RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
-	OutputRpiGpioCommand(irrigation_system_active_rpi_gpio, Commands.OFF)
+	ioid = irrigation_system_active_rpi_gpio.gpioNumber
+	zone = irrigation_system_active_rpi_gpio.zone
+
+	GPIO.setwarnings(False)
+	GPIO.setmode(GPIO.BOARD)
+
+	GPIO.setup(ioid, GPIO.OUT)
+    
+	GPIO.output(ioid, GPIO.LOW)
+	zone.is_on = True
+	zone.save()
 
 def TurnIrrigationSystemActiveOn():
 	irrigation_system_active_rpi_gpio = RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
-	OutputRpiGpioCommand(irrigation_system_active_rpi_gpio, Commands.ON)
+	ioid = irrigation_system_active_rpi_gpio.gpioNumber
+	zone = irrigation_system_active_rpi_gpio.zone
+
+	GPIO.setwarnings(False)
+	GPIO.setmode(GPIO.BOARD)
+
+	GPIO.setup(ioid, GPIO.OUT)
+    
+	GPIO.output(ioid, GPIO.HIGH)
+	zone.is_on = True
+	zone.save()
+

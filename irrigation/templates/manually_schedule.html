@@ -23,11 +23,11 @@
     <div id="content" align="center">
         <form action="/create_schedule/" method="post">
         {% csrf_token %}
-        {% if todays_requests %}
-          {% if todays_requests|length > 0 %}
-            <div id=schedule_warning>Attention:  There are {{ todays_requests|length }} scheduled items which will be <b>Cancelled</b> if you manually schedule</div>
-          {% endif %}
-        {% endif %}
+			{% if todays_requests %}
+			  {% if todays_requests|length > 0 %}
+				<div id=schedule_warning>Attention:  There are {{ todays_requests|length }} scheduled items which will be <b>Cancelled</b> if you manually schedule</div>
+			  {% endif %}
+			{% endif %}
             <table id="schedule_table" width="790" border="0" cellspacing="0" cellpadding="0">
               <tr>
                 <th>Zone</th>
