@@ -20,12 +20,28 @@ class ZoneAdmin(admin.ModelAdmin):
 
 admin.site.register(Zone, ZoneAdmin)
 
+class IrrigationScheduleInline(admin.TabularInline):
+    model = IrrigationSchedule
+    fields = ('zone', 'duration','sortOrder',)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'schedule':
+            kwargs["queryset"] = IrrigationSchedule.objects.all().select_related('schedule')
+        return super(IrrigationScheduleInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        formfield = super(IrrigationScheduleInline, self).formfield_for_dbfield(db_field, **kwargs)
+        if db_field.name == 'schedule':
+            # dirty trick so queryset is evaluated and cached in .choices
+            formfield.choices = formfield.choices
+        return formfield
 
 class ScheduleAdmin(admin.ModelAdmin):
     fields = ('shortName', 'displayName','startTime', 'enabled',)
     list_display = ('displayName', 'shortName', 'startTime', 'enabled',)
     list_filter = ('enabled',)
-    ordering = ('displayName',)
+    # ordering = ('displayName',)
+    inlines = (IrrigationScheduleInline,)
 
 admin.site.register(Schedule, ScheduleAdmin)
 

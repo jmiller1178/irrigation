@@ -11,6 +11,7 @@ class Zone(models.Model):
         db_table = 'zone'
         verbose_name = 'Zone'
         verbose_name_plural = "Zones"
+        ordering=['sortOrder']
     zoneId = models.IntegerField(primary_key="True")
     shortName = models.CharField(max_length=45)
     shortName.verbose_name= "Short Name"
@@ -166,6 +167,7 @@ class IrrigationSchedule(models.Model):
         db_table = "irrigationSchedule"
         verbose_name = "Irrigation Schedule"
         verbose_name_plural = "Irrigation Schedules"
+        ordering=['sortOrder']
     schedule = models.ForeignKey(Schedule,  db_column="scheduleId")
     zone = models.ForeignKey(Zone,  db_column="zoneId")
     weekDays = models.ManyToManyField(WeekDay)
