@@ -146,7 +146,11 @@ TEMPLATES = [
     },
 ]
 INTERNET_CHECK_URL='http://www.yahoo.com'
-WEATHER_URL="https://query.yahooapis.com/v1/public/yql?"
+
+WEATHER_URL="https://weather-ydn-yql.media.yahoo.com/forecastrss"
+WEATHER_APP_ID = 'RM92pQ50'
+WEATHER_CONSUMER_KEY = 'dj0yJmk9YWxGUmNERE8yY3ZPJmQ9WVdrOVVrMDVNbkJSTlRBbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWZk'
+WEATHER_CONSUMER_SECRET = '10f18a7036102224a29c5a8c9404920ae5594311'
 
 LOGGING = {
     'version': 1,
