@@ -1,7 +1,7 @@
 certifi==2017.11.5
 chardet==3.0.4
 daemon==1.1
-Django==1.11.7
+Django>=1.11.23
 django-appconf==1.0.2
 django-cachalot==1.5.0
 django-compressor==2.2
@@ -17,9 +17,9 @@ pkg-resources==0.0.0
 python-dateutil==2.6.1
 pytz==2017.3
 rcssmin==1.0.6
-requests==2.18.4
+requests>=2.20.0
 rjsmin==1.0.12
 RPi.GPIO==0.6.3
 six==1.11.0
 typing==3.6.2
-urllib3==1.22
+urllib3>=1.24.2
