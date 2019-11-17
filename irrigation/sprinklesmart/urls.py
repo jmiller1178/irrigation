@@ -1,5 +1,4 @@
 from django.conf.urls import url
-from django.contrib import admin
 from sprinklesmart import views
 
 urlpatterns = [
@@ -13,4 +12,5 @@ urlpatterns = [
     url(r'^rpi_gpio_request_cancel_all/', views.rpi_gpio_request_cancel_all, name='rpi_gpio_request_cancel_all'),
     url(r'^m/$', views.mobile_index, name='mobile_index'),
     url(r'^m/mobile_zone_control/(?P<zoneId>\d+)/$', views.mobile_zone_control, name='mobile_zone_control'),
+    url(r'^get_schedule/(?P<scheduleId>\d+)/$',  views.get_schedule,  name='get_schedule'), 
 ]

@@ -3,24 +3,18 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 
-from django.shortcuts import render_to_response, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import  reverse
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
 from django.db.models import Q
-from models import RpiGpioRequest
-from models import RpiGpio
-from models import Zone
-from models import Status
-from models import WeatherCondition
-from models import IrrigationSystem
-from django.template import Context, loader,  RequestContext
+from models import RpiGpioRequest,  RpiGpio,  Zone,  Status,  WeatherCondition,  IrrigationSystem,  Schedule
 from datetime import datetime, date, timedelta
 from django.conf import settings
-from django.db.models import Max
-from os.path import exists 
 from django.views.decorators.csrf import ensure_csrf_cookie
 from sprinklesmart.gpio.controller import OutputCommand, Commands
-from django.shortcuts import get_object_or_404
+
+from serializers import IrrigationScheduleSerializer
+from django.views.decorators.http import require_http_methods
+from django.http import  JsonResponse
 
 # main browser based view for the irrigation website
 # /index.html
@@ -70,6 +64,7 @@ def dashboard(request):
 				  'current_weather' : current_weather,
 				  'system_enabled' : system_enabled,
 				  'active_request' : active_request,
+                  'twentyfour_vac_enabled' : twentyfour_vac_enabled,
 				})
 
 # web browser single zone control view
@@ -118,10 +113,12 @@ def manually_schedule(request):
     zone_list = Zone.objects.filter(visible=True, enabled=True)
     todays_requests = RpiGpioRequest.objects.filter(status=1, onDateTime__contains=date.today())
     current_time_plus_5_minutes = (datetime.now() + timedelta(minutes=5)).strftime("%H:%M")
-                               
+    schedule_list = Schedule.objects.filter(enabled=True)     
+    
     return render(request, 
 		'manually_schedule.html',
 		{
+        'schedule_list': schedule_list, 
 		'zone_list' : zone_list,
 		'current_time_plus_5_minutes' : current_time_plus_5_minutes,
 		'todays_requests' : todays_requests,
@@ -210,7 +207,7 @@ def zone_toggle(request, zoneId):
 
     # check to see if it is in an ON state
     if zone.currentState() == "ON":
-		turn_zone_off(zoneId)
+        turn_zone_off(zoneId)
        
     # check to see if it is in an OFF state
     if zone.currentState() == "OFF":    
@@ -239,6 +236,17 @@ def rpi_gpio_request_cancel_all(request):
     cancelled_status = get_object_or_404(Status, pk=3)
     # cancel the ON requests
     for rpiGpioOnRequest in rpiGpioOnRequests:
-		rpiGpioOnRequest.status = cancelled_status
-		rpiGpioOnRequest.save()
+        rpiGpioOnRequest.status = cancelled_status
+        rpiGpioOnRequest.save()
     return HttpResponseRedirect('/')
+
+
+@require_http_methods(["GET"])
+def get_schedule(request,  scheduleId):
+    scheduleId = int(scheduleId)
+    schedule = get_object_or_404(Schedule,  pk=scheduleId)
+    queryset = schedule.irrigationschedule_set.all()
+    serializer = IrrigationScheduleSerializer(queryset, many=True)
+    
+    return JsonResponse(serializer.data, safe=False)
+    

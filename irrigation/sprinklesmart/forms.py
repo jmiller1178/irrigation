@@ -1,5 +1,5 @@
 from django import forms
-
+from models import Schedule
 class ManuallyScheduleForm(forms.ModelForm):
     schedule = forms.ModelChoiceField(
         queryset=Schedule.objects.all('shortName'),

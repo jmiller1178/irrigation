@@ -23,6 +23,17 @@
     <div id="content" align="center">
         <form action="/create_schedule/" method="post">
         {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.schedule.id_for_label }}" class="col-sm-2 control-label">Schedule</label>
+              <div class="col-sm-10">    
+                <select id="{{ form.schedule.id_for_label }}" name="{{ form.schedule.html_name }}" class="form-control">
+                  <option value="" selected>Please select a schedule</option>
+                  {% for schedule in schedule_list %}
+                  <option value="{{ schedule.scheduleId }}">{{ schedule.displayName }}</option>
+                  {% endfor %}
+                </select>    
+              </div>
+            </div>
 			{% if todays_requests %}
 			  {% if todays_requests|length > 0 %}
 				<div id=schedule_warning>Attention:  There are {{ todays_requests|length }} scheduled items which will be <b>Cancelled</b> if you manually schedule</div>

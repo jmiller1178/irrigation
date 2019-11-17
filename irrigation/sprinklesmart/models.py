@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.db import models
-from django.utils import timezone
-from django.contrib import admin
-from datetime import datetime, date, timedelta
+import datetime
 
 class Zone(models.Model):
     class Meta:
