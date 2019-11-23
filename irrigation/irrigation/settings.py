@@ -1,6 +1,7 @@
 import os
 from utils.logging_filters import skip_suspicious_operations
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 PROJECT_ROOT = os.path.abspath(os.path.split(os.path.dirname(__file__))[0])
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +19,12 @@ SECRET_KEY = '#va$&%c7om&k5=hemp$)@#l%(9-ki#f-(==la6tu(@5kp)1m@$'
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '192.168.1.125', '192.168.1.126','192.168.1.127',]
-
+INTERNAL_IPS = [
+    
+    '127.0.0.1',
+    '192.168.1.125', 
+    
+]
 SYSTEM_ENABLED_GPIO = 'GPIO23'
 IRRIGATION_ACTIVE_GPIO = 'GPIO24'
 
@@ -40,9 +46,11 @@ INSTALLED_APPS = [
     'django_extensions',
     'sprinklesmart',
     'rest_framework',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -120,8 +128,6 @@ STATICFILES_FINDERS = (
     'compressor.finders.CompressorFinder',
     'sass_processor.finders.CssFinder'
 )
-
-
 
 TEMPLATES = [
     {
