@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": "envs/irrigation/bin/python",
+    "python.linting.pylintEnabled": true
+}
