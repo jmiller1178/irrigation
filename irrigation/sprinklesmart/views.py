@@ -6,13 +6,13 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.db.models import Q
-from models import RpiGpioRequest,  RpiGpio,  Zone,  Status,  WeatherCondition,  IrrigationSystem,  Schedule
+from . models import RpiGpioRequest,  RpiGpio,  Zone,  Status,\
+      WeatherCondition,  IrrigationSystem,  Schedule
 from datetime import datetime, date, timedelta
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
-from sprinklesmart.gpio.controller import OutputCommand, Commands
-
-from serializers import IrrigationScheduleSerializer
+from sprinklesmart.gpio.controller import *
+from . serializers import IrrigationScheduleSerializer
 from django.views.decorators.http import require_http_methods
 from django.http import  JsonResponse
 
@@ -250,3 +250,18 @@ def get_schedule(request,  scheduleId):
     
     return JsonResponse(serializer.data, safe=False)
     
+@require_http_methods(["GET"])
+def enable_system(request):
+    TurnIrrigationSystemActiveOn()
+
+@require_http_methods(["GET"])
+def disable_system(request):
+    TurnIrrigationSystemActiveOff()
+
+@require_http_methods(["GET"])
+def enable_24VAC(request):
+    Turn24VACOn()
+
+@require_http_methods(["GET"])
+def disable_24VAC(request):
+    Turn24VACOff()

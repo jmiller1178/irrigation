@@ -6,6 +6,6 @@ irrigation/daemon/.cache/
 irrigation/daemon/.local/
 *.py[cod]
 local_settings.py
-
+irrigation/static/CACHE/
 
 

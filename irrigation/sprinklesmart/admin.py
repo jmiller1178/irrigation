@@ -2,15 +2,8 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from models import Zone
-from models import Schedule
-from models import RpiGpio
-from models import RpiGpioRequest
-from models import IrrigationSchedule
-from models import WeekDay
-from models import Status
-from models import IrrigationSystem
-from models import ConditionCode, WeatherCondition
+from . models import Zone, Schedule, RpiGpio, RpiGpioRequest,IrrigationSchedule
+from . models import WeekDay, Status, IrrigationSystem, ConditionCode, WeatherCondition
 
 class ZoneAdmin(admin.ModelAdmin):
     list_display = ('displayName', 'locationName', 'enabled', 'is_on', 'visible','sortOrder',)

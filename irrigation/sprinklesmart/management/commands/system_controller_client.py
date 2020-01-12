@@ -11,9 +11,9 @@ import time
 logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-    help = 'System Controller Client'
-    
-    def handle(self, *args, **options):
+	help = 'System Controller Client'
+	
+	def handle(self, *args, **options):
 		rpi_gpio = RpiGpio.objects.get(gpioName='GPIO27')
 		ioid = rpi_gpio.gpioNumber
 		zone = rpi_gpio.zone
@@ -27,7 +27,7 @@ class Command(BaseCommand):
 				s.connect((host, port))
 				s.send("hello world")
 				OutputCommand(ioid, zone, Commands.ON)
-				print "the message has been sent"
+				print ("the message has been sent")
 			
 				time.sleep(1)
 				

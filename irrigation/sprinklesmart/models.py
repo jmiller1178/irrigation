@@ -101,7 +101,7 @@ class RpiGpio(models.Model):
         verbose_name_plural = "RPI GPIO"
     rpiGpioId = models.IntegerField(primary_key="True")
     rpiGpioId.verbose_name = "RPI GPIO Id"
-    zone = models.ForeignKey(Zone, db_column="zoneId")
+    zone = models.ForeignKey(Zone, db_column="zoneId", on_delete=models.PROTECT)
     gpioName = models.CharField(max_length=45)
     gpioName.verbose_name = "GPIO Name"
     gpioNumber = models.CharField(max_length=45)
@@ -118,7 +118,7 @@ class RpiGpioRequest(models.Model):
         db_table = "rpiGpioRequest"
         verbose_name = "RPI GPIO Request"
         verbose_name_plural = "RPI GPIO Requests"
-    rpiGpio = models.ForeignKey(RpiGpio,  db_column="rpiGpioId")
+    rpiGpio = models.ForeignKey(RpiGpio,  db_column="rpiGpioId", on_delete=models.PROTECT)
     rpiGpio.verbose_name = "RPI GPIO"
     
     onDateTime = models.DateTimeField()
@@ -126,7 +126,7 @@ class RpiGpioRequest(models.Model):
     offDateTime = models.DateTimeField()
     offDateTime.verbose_name = "Off Date & Time"
 
-    status = models.ForeignKey(Status,  db_column="statusId")
+    status = models.ForeignKey(Status,  db_column="statusId", on_delete=models.PROTECT)
     durationMultiplier = models.FloatField(default = 1.0)
 
     def onDate(self):
@@ -165,8 +165,8 @@ class IrrigationSchedule(models.Model):
         verbose_name = "Irrigation Schedule"
         verbose_name_plural = "Irrigation Schedules"
         ordering=['sortOrder']
-    schedule = models.ForeignKey(Schedule,  db_column="scheduleId")
-    zone = models.ForeignKey(Zone,  db_column="zoneId")
+    schedule = models.ForeignKey(Schedule,  db_column="scheduleId", on_delete=models.PROTECT)
+    zone = models.ForeignKey(Zone,  db_column="zoneId", on_delete=models.PROTECT)
     weekDays = models.ManyToManyField(WeekDay)
     weekDays.verbose_name = "Week Days"
     weekDays.verbose_name_plural = "Week Days"
@@ -208,7 +208,7 @@ class WeatherCondition(models.Model):
     conditionDateTime.verbose_name = "Date & Time"
     temperature = models.DecimalField(max_digits=5, decimal_places=2)
     unitOfMeasure = models.CharField(max_length=10, default="F")
-    conditionCode = models.ForeignKey(ConditionCode, db_column="code")
+    conditionCode = models.ForeignKey(ConditionCode, db_column="code", on_delete=models.PROTECT)
     forecastDay1 = models.CharField(max_length=512, default='')
     forecastDay2 = models.CharField(max_length=512, default='')
     forecastDay3 = models.CharField(max_length=512, default='')

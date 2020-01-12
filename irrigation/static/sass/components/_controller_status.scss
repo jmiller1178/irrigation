@@ -1,0 +1,120 @@
+.controller {
+    &__button {
+        height: 7rem;
+        width: 7rem;
+        display: inline-block;
+        border-radius: 50%;
+        z-index: 2000;
+        box-shadow: 0 1rem 3rem rgba($color-black, .1);
+        text-align: center;
+        cursor: pointer;
+       
+        &-enabled {
+            background-color: $color-primary-light;
+            background: radial-gradient($color-primary-light2, $color-primary-light 25%, $color-primary 50%, $color-grey-dark-3 100%);
+        }
+        &-disabled {
+            background-color: $color-red-light;
+            background: radial-gradient($color-red-light, $color-red-light 25%, $color-red 50%, $color-grey-dark-3 100%);
+        }
+
+        @include respond(tab-port) {
+            top: 4rem;
+            right: 4rem;
+        }
+
+        @include respond(phone) {
+            top: 3rem;
+            right: 3rem;
+        }
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 1rem 2rem rgba($color-black,.2);
+    
+            &::after {
+                transform: scaleX(1.4) scaleY(1.6);
+                opacity: 0;
+            }
+        }
+        
+        &:active,
+        &:focus {
+            outline: none;
+            transform: translateY(-1px);
+            box-shadow: 0 .5rem 1rem rgba($color-black,.2);
+        }
+    }
+
+    &__status_text {
+        display: inline-block;
+        font-size: 2.8rem;
+        font-weight: 300;
+        text-transform: uppercase;
+        // position: absolute;
+        // padding-left: 2rem;
+         cursor: pointer;
+        position: relative;
+        padding-left: 4.5rem;
+    }
+
+    &___button-label {
+        height: 3rem;
+        width: 3rem;
+        border: 5px solid $color-primary;
+        border-radius: 50%;
+        display: inline-block;
+        position: absolute;
+        left: 0;
+        top: -.4rem;
+
+        &::after {
+            content: "";
+            display: block;
+            height: 1.3rem;
+            width: 1.3rem;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: $color-primary;
+            opacity: 0;
+            transition: opacity .2s;
+        }
+    }
+
+    // &__background {
+    //     height: 6rem;
+    //     width: 6rem;
+    //     border-radius: 50%;
+    //     position: absolute;
+      
+    //         background-image: radial-gradient($color-primary-light, $color-primary-dark);
+        
+    //     &__disabled {
+    //         background-image: radial-gradient($color-red-light, $color-red-dark);
+    //     }
+    //     z-index: 1000;
+    //     transition: transform .8s cubic-bezier(0.86, 0, 0.07, 1);
+
+    //     @include respond(tab-port) {
+    //         top: 4.5rem;
+    //         right: 4.5rem;
+    //     }
+
+    //     @include respond(phone) {
+    //         top: 3.5rem;
+    //         right: 3.5rem;
+    //     }
+    // }
+
+    &__button:hover &__icon::before {
+        top: -1rem;
+    }
+
+    &__button:hover &__icon::after {
+        top: 1rem;
+    }
+
+}

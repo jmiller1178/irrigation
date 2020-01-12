@@ -1,6 +1,6 @@
 import os
 from utils.logging_filters import skip_suspicious_operations
-
+from django.conf import settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 PROJECT_ROOT = os.path.abspath(os.path.split(os.path.dirname(__file__))[0])
@@ -9,6 +9,11 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
+SASS_PROCESSOR_INCLUDE_DIRS = (
+    os.path.join(PROJECT_ROOT, 'sass'),
+)
+SASS_PROCESSOR_ENABLED = True
+COMPRESS_ENABLED = True
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
@@ -34,7 +39,7 @@ STATIC_URL = '/static/'
 # Application definition
 
 INSTALLED_APPS = [
-	'djangocms_admin_style',
+    'djangocms_admin_style',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +52,9 @@ INSTALLED_APPS = [
     'sprinklesmart',
     'rest_framework',
     'debug_toolbar',
+    'compressor',
+    'sass_processor',
+    # 'GPIOSimulator',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +94,13 @@ WSGI_APPLICATION = 'irrigation.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+
+
 DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(settings.BASE_DIR, 'db/irrigation_rpi3.db'),
+    }
 }
 
 
@@ -195,11 +209,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        'sprinklesmart': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
+        # 'sprinklesmart': {
+        #     'handlers': ['file'],
+        #     'level': 'DEBUG',
+        #     'propagate': False,
+        # },
         'sprinklesmart.management':{
             'handlers': ['file'],
             'level': 'DEBUG',
@@ -219,4 +233,4 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
-from local_settings import *
+# from local_settings import *

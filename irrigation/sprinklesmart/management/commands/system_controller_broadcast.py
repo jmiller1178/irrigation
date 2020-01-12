@@ -11,9 +11,9 @@ import sys
 logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-    help = 'Process RPi GPIO Requests'
-    
-    def handle(self, *args, **options):
+	help = 'Process RPi GPIO Requests'
+	
+	def handle(self, *args, **options):
 		# Create a TCP/IP socket
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

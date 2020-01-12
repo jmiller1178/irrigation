@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "envs/irrigation/bin/python",
+    "python.pythonPath": "C:\\Users\\jeff\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe",
     "python.linting.pylintEnabled": true
 }

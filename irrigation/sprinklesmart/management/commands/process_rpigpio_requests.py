@@ -24,7 +24,7 @@ class Command(BaseCommand):
 		# get the current weatherconditions
         current_weather = WeatherCondition.objects.order_by('-id')[0]
 
-		# read the IrrigationSystem.systemState	
+		# read the IrrigationSystem.systemState
         irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
         system_enabled = irrigation_system.systemState
         

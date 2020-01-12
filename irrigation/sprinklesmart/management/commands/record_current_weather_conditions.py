@@ -6,9 +6,9 @@ from sprinklesmart import models
 from django.shortcuts import get_object_or_404
 
 class Command(BaseCommand):
-    help = 'Record Current Weather Conditions'
+	help = 'Record Current Weather Conditions'
 
-    def internet_is_available(self):
+	def internet_is_available(self):
 		available = False
 		try:
 			response=urllib2.urlopen(settings.INTERNET_CHECK_URL,timeout=1)
@@ -18,7 +18,7 @@ class Command(BaseCommand):
 			
 		return available
 
-    def handle(self, *args, **options):
+	def handle(self, *args, **options):
 		# check for internet availability before trying to read the weather conditions    
 		if self.internet_is_available():
 			weatherApi = WeatherAPI()
