@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-import urllib2
 from sprinklesmart.api.weather import WeatherAPI
 from django.shortcuts import get_object_or_404
 from datetime import datetime, date, timedelta
@@ -21,7 +20,7 @@ class Command(BaseCommand):
         # have to execute any of the code below, right??
         requests = RpiGpioRequest.objects.filter(Q(status=active_status) | Q(status=pending_status), onDateTime__contains=date.today())
         
-        if requests.count() ==0:
+        if requests.count() == 0:
             # there is nothing scheduled for today so do the scheduling process
             
             # look for active schedule(s) with a start time within the next hour

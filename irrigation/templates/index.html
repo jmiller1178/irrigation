@@ -56,18 +56,19 @@
                 {% endif %}
               </div>
           </div>
-          <div class="row">
+          <div class="row weather-conditions">
             <h3 class="heading-tertiary u-margin-bottom-small">Current Weather Conditions</h3> 
-            <p class="paragraph">
-              As of {{ current_weather.conditionDateTime }} {{ current_weather.conditionCode.description }} and {{ current_weather.temperature }}&deg;
+            <p class="paragraph temperature">
+              As of {{ current_weather.conditionDateTime }} {{ current_weather.conditionCode.description }} and {{ current_weather.temperature|floatformat:0 }}&deg; F
           </p>
           {% if current_weather %}
-            <h3 class="heading-tertiary u-margin-bottom-small"></h3>
+            <h3 class="heading-tertiary u-margin-bottom-small">
               {% if current_weather.conditionCode.IsRaining %}
                 <p class="paragraph">It is raining outside</p>
               {% else %}
                 <p class="paragraph">It is not raining outside</p>
               {% endif %}
+            </h3>
           {% endif %}
           </div>
           <!---->
@@ -75,64 +76,67 @@
       </div>
   </header>
   <main>
-      <section class="section-status">
-        <div class="row">
-                  <p class="paragraph">
-                      As of {{ current_weather.conditionDateTime }} {{ current_weather.conditionCode.description }} and {{ current_weather.temperature }}&deg;
-                  </p>
-                  {% if current_weather %}
-                    <h3 class="heading-tertiary u-margin-bottom-small"></h3>
-                      {% if current_weather.conditionCode.IsRaining %}
-                        <p class="paragraph">It is raining outside</p>
-                      {% else %}
-                        <p class="paragraph">It is not raining outside</p>
-                      {% endif %}
-                  {% endif %}
-          </div>
-        
+    <section class="section-status">
+      <div class="row">
+        <div class="col-1-of-2">
+          <table class="table table-condensed table-bordered">
+            <thead>
+                <tr>
+                    <th>Zone</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Duration</th>
+                    <th>Remaining</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in todays_requests %}
+                  <tr>    
+                      <td><a href="/zone_control/{{ request.rpiGpio.zone.zoneId }}" >{{ request.rpiGpio.zone.displayName }}</a></td>
+                      <td>{{ request.onTime }}</td>
+                      <td>{{ request.offTime }}</td>
+                      <td>{{ request.duration }}</td>
+                      <td>{{ request.remaining }}</td>
+                      <td>
+                        {% if request.rpiGpio.zone.is_on == True %}
+                          <a href="/rpi_gpio_request_cancel/{{ request.id }}" ><img src="{% static 'img/cancel_button.jpg' %}" alt="cancel" /></a>
+                        {% else %}
+                          &nbsp;
+                        {% endif %}  
+                      </td>
+                  </tr>
+                {% endfor %}
+            </tbody>
+          </table>
         </div>
+        <div class="col-2-of-2">
+          <table class="table table-condensed table-bordered">
+            <thead>
+                <tr>
+                    <th>Zone</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for zone in zone_list %}
+                  <tr>    
+                      <td><a href="/zone_control/{{ zone.zoneId }}" >{{ zone.displayName }}</a></td>
+                      <td>
+                        {% if zone.currentState == "ON" %}
+                          <img src="{% static 'img/greenlight.jpg' %}" alt="ON" width=19 height=19 />
+                        {% else %}
+                          <img src="{% static 'img/redlight.jpg' %}" alt="OFF" width=15 height=15 />
+                        {% endif %}
+                      </td>
+                  </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>  
     </section>
 
-    <div id="content">
-        
-          
-
-        <div id="todays_schedule">Status</div>
-            
-<div id="todays_schedule">Today's Schedule</div>
-        <a href="/rpi_gpio_request_cancel_all" ><img src="{% static 'img/cancel_button.jpg' %}" alt="cancel all" /></a>
-            {% if todays_requests %}
-              {% for request in todays_requests %}
-                
-                  <a href="/zone_control/{{ request.rpiGpio.zone.zoneId }}" >{{ request.rpiGpio.zone.shortName }}</a>
-                  {{ request.onTime }}
-                  {{ request.offTime }}
-                  {{ request.duration }}
-                  {{ request.remaining }}
-                  {% if request.rpiGpio.zone.is_on == True %}
-                    <a href="/rpi_gpio_request_cancel/{{ request.id }}" ><img src="{% static 'img/cancel_button.jpg' %}" alt="cancel" /></a>
-                  {% else %}
-                    &nbsp;
-                  {% endif %}  
-              {% endfor %}
-            {% else %}
-              Nothing scheduled for today
-            {% endif %}
-    <div id="zone_status" valign="top">Zone Status</div>
-         
-            {% if zone_list %}
-              {% for zone in zone_list %}
-               <a href="/zone_control/{{ zone.zoneId }}" >{{ zone.displayName }}</a>
-                  {% if zone.currentState == "ON" %}
-                   <img src="{% static 'img/greenlight.jpg' %}" alt="ON" width=19 height=19 />
-                  {% else %}
-                   <img src="{% static 'img/redlight.jpg' %}" alt="OFF" width=15 height=15 />
-                  {% endif %}
-               
-              {% endfor %}
-            {% else %}
-              No Zone Info Available
-            {% endif %}
-    </div>
+    
   </main>
 </body>

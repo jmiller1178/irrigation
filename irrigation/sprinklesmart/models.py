@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from datetime import datetime
 from django.db import models
-import datetime
+
 
 class Zone(models.Model):
     class Meta:
@@ -27,9 +28,12 @@ class Zone(models.Model):
         return "ON"
       else:
         return "OFF"
+
     def __unicode__(self):
       return self.displayName
 
+    def __str__(self):
+        return self.displayName
 
 # 6/5/2013 JRM - added this class
 class IrrigationSystem(models.Model):
@@ -41,6 +45,12 @@ class IrrigationSystem(models.Model):
     systemState = models.BooleanField(db_column="system_state")
     
     def __unicode__(self):
+        if self.systemState == True:
+            return "Enabled"
+        else:
+            return "Disabled"
+
+    def __str__(self):
         if self.systemState == True:
             return "Enabled"
         else:
@@ -59,7 +69,8 @@ class Status(models.Model):
     displayName.verbose_name = "Status"
     def __unicode__(self):
         return self.displayName
-
+    def __str__(self):
+        return self.displayName
         
 class WeekDay(models.Model):
     class Meta:
@@ -73,7 +84,8 @@ class WeekDay(models.Model):
     
     def __unicode__(self):
         return self.shortName
-    
+    def __str__(self):
+        return self.shortName
     
 class Schedule(models.Model):
     class Meta:
@@ -92,7 +104,8 @@ class Schedule(models.Model):
 
     def __unicode__(self):
         return self.displayName
-
+    def __str__(self):
+        return self.displayName
 
 class RpiGpio(models.Model):
     class Meta:
@@ -111,7 +124,8 @@ class RpiGpio(models.Model):
         return self.zone.displayName + ' ' + self.gpioName
     def __unicode__(self):
         return self.gpioName
-
+    def __str__(self):
+        return self.gpioName
 
 class RpiGpioRequest(models.Model):
     class Meta:
@@ -157,7 +171,8 @@ class RpiGpioRequest(models.Model):
 
     def __unicode__(self):
         return self.rpiGpio.displayName() + ' ' + self.status.displayName + ' ON: ' + str(self.onDateTime) + ' OFF: ' + str(self.offDateTime)
-
+    def __str__(self):
+        return self.rpiGpio.displayName() + ' ' + self.status.displayName + ' ON: ' + str(self.onDateTime) + ' OFF: ' + str(self.offDateTime)
   
 class IrrigationSchedule(models.Model):
     class Meta:
@@ -178,7 +193,8 @@ class IrrigationSchedule(models.Model):
       return self.schedule.displayName + ' ' + self.zone.displayName
     def __unicode__(self):
       return self.displayName()
-
+    def __str__(self):
+      return self.displayName()
 
 class ConditionCode(models.Model):
     class Meta:
@@ -195,7 +211,8 @@ class ConditionCode(models.Model):
 
     def __unicode__(self):
         return self.description
-        
+    def __str__(self):
+        return self.description    
 
 class WeatherCondition(models.Model):
     class Meta:
