@@ -19,53 +19,54 @@ from django.http import  JsonResponse
 # main browser based view for the irrigation website
 # /index.html
 def index(request):
-	zone_list = Zone.objects.filter(visible=True, enabled=True)
-	current_date = datetime.now()
-	todays_requests = RpiGpioRequest.objects.filter(status__in=[1,4], onDateTime__contains=date.today())
+    zone_list = Zone.objects.filter(visible=True, enabled=True)
+    current_date = datetime.now()
+    todays_requests = RpiGpioRequest.objects.filter(status__in=[1,4],\
+    onDateTime__contains=date.today())
 
-	# latest WeatherCondtion
-	current_weather = WeatherCondition.objects.order_by('-id')[0]
-	
-	# 1st look for the IrrigationSystem.systemState	
-	irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
-	system_enabled = irrigation_system.systemState
-	
-	# next look for the RpiGpio associated to system enabling - this one will enable the 24VAC to the valve control relays
-	system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
-	twentyfour_vac_enabled = system_enabled_rpi_gpio.zone.is_on
-	
-	return render(request, 
-				'index.html', 
-				{
-				  'zone_list' : zone_list,
-				  'current_date' : current_date,
-				  'todays_requests' : todays_requests,
-				  'current_weather' : current_weather,
-				  'system_enabled' : system_enabled,
-				  'twentyfour_vac_enabled' : twentyfour_vac_enabled,
-				})
+    # latest WeatherCondtion
+    current_weather = WeatherCondition.objects.order_by('-id')[0]
+    
+    # 1st look for the IrrigationSystem.systemState	
+    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+    system_enabled = irrigation_system.systemState
+    
+    # next look for the RpiGpio associated to system enabling - this one will enable the 24VAC to the valve control relays
+    system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
+    twentyfour_vac_enabled = system_enabled_rpi_gpio.zone.is_on
+    
+    return render(request, 
+                'index.html', 
+                {
+                  'zone_list' : zone_list,
+                  'current_date' : current_date,
+                  'todays_requests' : todays_requests,
+                  'current_weather' : current_weather,
+                  'system_enabled' : system_enabled,
+                  'twentyfour_vac_enabled' : twentyfour_vac_enabled,
+                })
                               
                               
 def dashboard(request):
-	active_status = get_object_or_404(Status, pk=4) 
-	
-	# this is the GPIO which enables 24VAC to the valve control relays 	
-	system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
-	twentyfour_vac_enabled = system_enabled_rpi_gpio.zone.is_on
+    active_status = get_object_or_404(Status, pk=4) 
+    
+    # this is the GPIO which enables 24VAC to the valve control relays 	
+    system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
+    twentyfour_vac_enabled = system_enabled_rpi_gpio.zone.is_on
 
-	# get the current weatherconditions
-	current_weather = WeatherCondition.objects.order_by('-id')[0]
-	irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
-	system_enabled = irrigation_system.systemState
-	active_request = RpiGpioRequest.objects.get(status=active_status)
-	return render(request, 
-				'dashboard.html', 
-				{
-				  'current_weather' : current_weather,
-				  'system_enabled' : system_enabled,
-				  'active_request' : active_request,
-                  'twentyfour_vac_enabled' : twentyfour_vac_enabled,
-				})
+    # get the current weatherconditions
+    current_weather = WeatherCondition.objects.order_by('-id')[0]
+    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+    system_enabled = irrigation_system.systemState
+    active_request = RpiGpioRequest.objects.get(status=active_status)
+    return render(request, 
+                'dashboard.html', 
+                    {
+                    'current_weather' : current_weather,
+                    'system_enabled' : system_enabled,
+                    'active_request' : active_request,
+                    'twentyfour_vac_enabled' : twentyfour_vac_enabled,
+                    })
 
 # web browser single zone control view
 # /zone_control.html
@@ -74,11 +75,11 @@ def zone_control(request, zoneId):
     zone = get_object_or_404(Zone, pk=zoneId)
     active_request = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
     return render(request, 
-				'zone_control.html', 
+                'zone_control.html', 
                 {
-				'zone': zone,
-				'active_request' : active_request,
-				})
+                'zone': zone,
+                'active_request' : active_request,
+                })
 
 # main mobile browser based view for the irrigation website
 # /mobile/mobile_index.html
@@ -87,11 +88,11 @@ def mobile_index(request):
     zone_list = Zone.objects.filter(visible=True, enabled=True)
     active_request = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
     return render(request,
-				'mobile/mobile_index.html', 
-                {
-                'zone_list' : zone_list,
-                'active_request' : active_request,
-                })
+                'mobile/mobile_index.html', 
+                    {
+                    'zone_list' : zone_list,
+                    'active_request' : active_request,
+                    })
 
 # mobile browser single zone control view
 # /mobile/mobile_zone_control.html
@@ -100,11 +101,11 @@ def mobile_zone_control(request, zoneId):
     zone = get_object_or_404(Zone, pk=zoneId)
     active_request = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
     return render(request, 
-				'mobile/mobile_zone_control.html', 
-                {
-                'zone': zone,
-                'active_request' : active_request,
-                })
+                'mobile/mobile_zone_control.html', 
+                    {
+                    'zone': zone,
+                    'active_request' : active_request,
+                    })
 
 # web browser view invoked when the page for manually scheduling zone activities is loaded
 # /manually_schedule.html
@@ -116,13 +117,13 @@ def manually_schedule(request):
     schedule_list = Schedule.objects.filter(enabled=True)     
     
     return render(request, 
-		'manually_schedule.html',
-		{
-        'schedule_list': schedule_list, 
-		'zone_list' : zone_list,
-		'current_time_plus_5_minutes' : current_time_plus_5_minutes,
-		'todays_requests' : todays_requests,
-		})                               
+        'manually_schedule.html',
+            {
+            'schedule_list': schedule_list, 
+            'zone_list' : zone_list,
+            'current_time_plus_5_minutes' : current_time_plus_5_minutes,
+            'todays_requests' : todays_requests,
+            })                               
 
 
 # this is the command that is invoked when the user is on the manual schedule page and they click
@@ -184,21 +185,21 @@ def cancel_all_current_requests():
 
 
 def turn_zone_on(zoneId):
-	# read the Zone info from the database
-	zone = get_object_or_404(Zone, pk=zoneId)
-	rpiGpio = RpiGpio.objects.get(zone=zone)
-	ioid = rpiGpio.gpioNumber
+    # read the Zone info from the database
+    zone = get_object_or_404(Zone, pk=zoneId)
+    rpiGpio = RpiGpio.objects.get(zone=zone)
+    ioid = rpiGpio.gpioNumber
 
-	OutputCommand(ioid, zone, Commands.ON)
+    OutputCommand(ioid, zone, Commands.ON)
 
 
 def turn_zone_off(zoneId):
-	# read the Zone info from the database
-	zone = get_object_or_404(Zone, pk=zoneId)
-	rpiGpio = RpiGpio.objects.get(zone=zone)
-	ioid = rpiGpio.gpioNumber
+    # read the Zone info from the database
+    zone = get_object_or_404(Zone, pk=zoneId)
+    rpiGpio = RpiGpio.objects.get(zone=zone)
+    ioid = rpiGpio.gpioNumber
 
-	OutputCommand(ioid, zone, Commands.OFF)
+    OutputCommand(ioid, zone, Commands.OFF)
 
 
 def zone_toggle(request, zoneId):
@@ -231,7 +232,7 @@ def rpi_gpio_request_cancel(request, id):
 
     
 def rpi_gpio_request_cancel_all(request):
-	# 1 is pending 4 is active
+    # 1 is pending 4 is active
     rpiGpioOnRequests = RpiGpioRequest.objects.filter(Q(status=1) | Q(status=4))
     cancelled_status = get_object_or_404(Status, pk=3)
     # cancel the ON requests
@@ -253,15 +254,19 @@ def get_schedule(request,  scheduleId):
 @require_http_methods(["GET"])
 def enable_system(request):
     TurnIrrigationSystemActiveOn()
+    return HttpResponseRedirect('/')
 
 @require_http_methods(["GET"])
 def disable_system(request):
     TurnIrrigationSystemActiveOff()
+    return HttpResponseRedirect('/')
 
 @require_http_methods(["GET"])
 def enable_24VAC(request):
     Turn24VACOn()
+    return HttpResponseRedirect('/')
 
 @require_http_methods(["GET"])
 def disable_24VAC(request):
     Turn24VACOff()
+    return HttpResponseRedirect('/')

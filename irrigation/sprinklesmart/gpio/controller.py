@@ -4,9 +4,9 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 if settings.GPIO_SIM_ENABLED:
-    import RPiSim.GPIO as GPIO
+    from RPiSim import GPIO
 else:
-    import RPi.GPIO as GPIO
+    from RPi import GPIO
 
 class Commands(Enum):
     OFF = 0
@@ -63,13 +63,18 @@ def TurnIrrigationSystemActiveOff():
         RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
     ioid = irrigation_system_active_rpi_gpio.gpioNumber
     zone = irrigation_system_active_rpi_gpio.zone
-
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BOARD)
-
-    GPIO.setup(ioid, GPIO.OUT)
     
-    GPIO.output(ioid, GPIO.LOW)
+    if hasattr(GPIO, 'setwarnings'):
+        GPIO.setwarnings(False)
+
+    if hasattr(GPIO,'setmode'):
+        GPIO.setmode(GPIO.BOARD)
+
+    if hasattr(GPIO,'setup'):
+        GPIO.setup(ioid, GPIO.OUT)
+    
+    if hasattr(GPIO, 'output'):
+        GPIO.output(ioid, GPIO.LOW)
     zone.is_on = True
     zone.save()
     TurnAllOutputsOff()
@@ -80,12 +85,16 @@ def TurnIrrigationSystemActiveOn():
     ioid = irrigation_system_active_rpi_gpio.gpioNumber
     zone = irrigation_system_active_rpi_gpio.zone
 
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BOARD)
+    if hasattr(GPIO, 'setwarnings'):
+        GPIO.setwarnings(False)
 
-    GPIO.setup(ioid, GPIO.OUT)
-    
-    GPIO.output(ioid, GPIO.HIGH)
+    if hasattr(GPIO,'setmode'):
+        GPIO.setmode(GPIO.BOARD)
+
+    if hasattr(GPIO,'setup'):
+        GPIO.setup(ioid, GPIO.OUT)
+    if hasattr(GPIO, 'output'):
+        GPIO.output(ioid, GPIO.HIGH)
     zone.is_on = True
     zone.save()
 
