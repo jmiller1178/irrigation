@@ -1,9 +1,12 @@
-# import RPi.GPIO as GPIO
-import RPiSim, RPiSim.GPIO
 from sprinklesmart.models import RpiGpio, Zone
 from enum import Enum
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+
+if settings.GPIO_SIM_ENABLED:
+    import RPiSim.GPIO as GPIO
+else:
+    import RPi.GPIO as GPIO
 
 class Commands(Enum):
     OFF = 0
