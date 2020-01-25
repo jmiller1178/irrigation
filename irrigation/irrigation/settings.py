@@ -233,4 +233,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
-# from local_settings import *
+
+try:
+    from irrigation.local_settings import *
+except ImportError:
+    pass
