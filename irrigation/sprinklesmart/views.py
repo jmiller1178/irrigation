@@ -6,8 +6,8 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.db.models import Q
-from . models import RpiGpioRequest,  RpiGpio,  Zone,  Status,\
-      WeatherCondition,  IrrigationSystem,  Schedule
+from . models import RpiGpioRequest, RpiGpio, Zone, Status,\
+      WeatherCondition, IrrigationSystem, Schedule
 from datetime import datetime, date, timedelta
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -15,6 +15,8 @@ from sprinklesmart.gpio.controller import *
 from . serializers import IrrigationScheduleSerializer
 from django.views.decorators.http import require_http_methods
 from django.http import  JsonResponse
+from django.views.decorators.http import require_GET, require_POST
+import json
 
 # main browser based view for the irrigation website
 # /index.html
@@ -202,24 +204,7 @@ def turn_zone_off(zoneId):
     OutputCommand(ioid, zone, Commands.OFF)
 
 
-def zone_toggle(request, zoneId):
-    # read the Zone info from the database
-    zone = get_object_or_404(Zone, pk=zoneId)
 
-    # check to see if it is in an ON state
-    if zone.currentState() == "ON":
-        turn_zone_off(zoneId)
-       
-    # check to see if it is in an OFF state
-    if zone.currentState() == "OFF":    
-        # it is OFF so create an RpiGpioRequest record to have it turned on
-        if request.method == 'POST':
-            #cancel_all_current_requests()
-            #duration = int(request.POST['duration'])
-            turn_zone_on(zoneId)
- 
-
-    return HttpResponseRedirect('/')
 
 
 def rpi_gpio_request_cancel(request, id):
@@ -250,23 +235,51 @@ def get_schedule(request,  scheduleId):
     serializer = IrrigationScheduleSerializer(queryset, many=True)
     
     return JsonResponse(serializer.data, safe=False)
-    
-@require_http_methods(["GET"])
-def enable_system(request):
-    TurnIrrigationSystemActiveOn()
-    return HttpResponseRedirect('/')
 
-@require_http_methods(["GET"])
-def disable_system(request):
-    TurnIrrigationSystemActiveOff()
-    return HttpResponseRedirect('/')
+# @require_http_methods(["GET"])
+# def enable_system(request):
+#     TurnIrrigationSystemActiveOn()
+#     return HttpResponseRedirect('/')
 
-@require_http_methods(["GET"])
-def enable_24VAC(request):
-    Turn24VACOn()
-    return HttpResponseRedirect('/')
+# @require_http_methods(["GET"])
+# def disable_system(request):
+#     TurnIrrigationSystemActiveOff()
+#     return HttpResponseRedirect('/')
 
-@require_http_methods(["GET"])
-def disable_24VAC(request):
-    Turn24VACOff()
-    return HttpResponseRedirect('/')
+# @require_http_methods(["GET"])
+# def enable_24VAC(request):
+#     Turn24VACOn()
+#     return HttpResponseRedirect('/')
+
+# @require_http_methods(["GET"])
+# def disable_24VAC(request):
+#     Turn24VACOff()
+#     return HttpResponseRedirect('/')
+
+@require_POST
+def toggle_zone(request):
+    response = {}
+    json_data = json.loads(request.body)
+    zone_id = json_data['zoneId']
+
+    # read the Zone info from the database
+    try:
+        zone = Zone.objects.get(pk=zone_id)
+        response['zone_id'] = zone.zoneId
+        response['zone_name'] = zone.displayName
+
+        # check to see if it is in an ON state
+        if zone.currentState() == "ON":
+            turn_zone_off(zone_id)
+            response["current_state"] = "OFF"
+        if zone.currentState() == "OFF":   
+            turn_zone_on(zone_id)
+            response["current_state"] = "ON"
+
+        response['success'] = True
+
+    except Zone.DoesNotExist:
+        response['error'] = "Zone {0} PK NOT FOUND".format(zone_id)
+        response['success'] = False
+
+    return JsonResponse(response)

@@ -7,13 +7,19 @@
   {% compress css %}
 
   <link type="text/x-scss" href="{% sass_src "sass/main.scss" %}" rel="stylesheet" />
-
+  
   {% endcompress %}
 
   <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900" rel="stylesheet">
 
   <link rel="stylesheet" href="{% static 'css/icon-font.css' %}">
   <link rel="shortcut icon" type="image/png" href="img/favicon.png">
+  <script  src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous">
+   </script>
+  <script src="{% static "js/utility.js" %}"></script>
+  <script src="{% static "js/irrigation.js" %}"></script>
 </head>
 <body>
   <div class="navigation">
@@ -43,16 +49,16 @@
           <div class="row">
               <div class="col-1-of-2">
                 {% if system_enabled == True %}
-                  <a href="/disable_system" class="btn btn--green">System Enabled</a>
+                  <span class="btn btn--green btn-toggle-zone" data-zone-id="21">System Enabled</span>
                 {% else %}
-                  <a href="/enable_system" class="btn btn--red">System Disabled</a>
+                  <span class="btn btn--red btn-toggle-zone" data-zone-id="21">System Disabled</span>
                 {% endif %}
               </div>
               <div class="col-2-of-2">
                 {% if twentyfour_vac_enabled == True %}
-                  <a href="/disable_24VAC" class="btn btn--green">24VAC Enabled</a>
+                  <span class="btn btn--green btn-toggle-zone" data-zone-id="22">24VAC Enabled</span>
                 {% else %}
-                  <a href="/enble_24VAC" class="btn btn--red">24VAC Disabled</a>
+                  <span class="btn btn--red btn-toggle-zone" data-zone-id="22">24VAC Disabled</span>
                 {% endif %}
               </div>
           </div>
