@@ -9,7 +9,7 @@ class Zone(models.Model):
         db_table = 'zone'
         verbose_name = 'Zone'
         verbose_name_plural = "Zones"
-        ordering=['sortOrder']
+        ordering = ['sortOrder']
     zoneId = models.IntegerField(primary_key="True")
     shortName = models.CharField(max_length=45)
     shortName.verbose_name = "Short Name"
@@ -36,6 +36,18 @@ class Zone(models.Model):
 
     def __str__(self):
         return self.displayName
+
+    @property
+    def json(self):
+        zone_json = {}
+        zone_json['zone_id'] = self.zoneId
+        zone_json['zone_name'] = self.displayName
+        zone_json['zone_is_on'] = self.is_on
+        zone_json['current_state'] = self.currentState()
+        zone_json['short_name'] = self.shortName
+        zone_json['visible'] = self.visible
+        zone_json['location_name'] = self.locationName
+        return zone_json
 
 # 6/5/2013 JRM - added this class
 class IrrigationSystem(models.Model):

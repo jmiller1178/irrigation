@@ -132,7 +132,7 @@
                   <tr>    
                       <td><a href="/zone_control/{{ zone.zoneId }}" >{{ zone.displayName }}</a></td>
                       <td>
-                        {% if zone.currentState == "ON" %}
+                        {% if zone.is_on %}
                           <img src="{% static 'img/greenlight.jpg' %}" alt="ON" width=19 height=19 />
                         {% else %}
                           <img src="{% static 'img/redlight.jpg' %}" alt="OFF" width=15 height=15 />

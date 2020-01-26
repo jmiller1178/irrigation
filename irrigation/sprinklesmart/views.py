@@ -273,13 +273,10 @@ def toggle_zone(request):
         # check to see if it is in an ON state
         if zone.is_on:
             zone = turn_zone_off(zone_id)
-        else:   
+        else:  
             zone = turn_zone_on(zone_id)
         
-        response['zone_id'] = zone.zoneId
-        response['zone_name'] = zone.displayName
-        response['zone_is_on'] = zone.is_on
-        response["current_state"] = zone.currentState()
+        response['zone'] = zone.json
         response['success'] = True
 
     except Zone.DoesNotExist:
