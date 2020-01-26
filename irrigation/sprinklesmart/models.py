@@ -15,12 +15,13 @@ class Zone(models.Model):
     shortName.verbose_name = "Short Name"
     displayName = models.CharField(max_length=255)
     displayName.verbose_name = "Display Name"
-    enabled = models.BooleanField(default = True)
-    visible = models.BooleanField(default = True)
+    enabled = models.BooleanField(default=True)
+    visible = models.BooleanField(default=True)
     sortOrder = models.IntegerField(default=0, blank=False)  
     is_on = models.BooleanField(default = False)
     is_on.verbose_name = "Current State"
-
+    enabledDisplayText = models.CharField(default="On", max_length=255, null=False, blank=True, verbose_name="Text to display when enabled is True")
+    disabledDisplayText = models.CharField(default="Off", max_length=255, null=False, blank=True, verbose_name="Text to display when enabled is False")
     locationName = models.CharField(max_length=45)
     locationName.verbose_name = "Location"
     def currentState(self):
