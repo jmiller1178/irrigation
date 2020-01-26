@@ -192,7 +192,7 @@ def turn_zone_on(zoneId):
     rpiGpio = RpiGpio.objects.get(zone=zone)
     # special case - Zone corresponds to RpiGpio SYSTEM_ENABLED_GPIO
     if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:
-        TurnIrrigationSystemActiveOn()
+        Turn24VACOn()
     else:
         ioid = rpiGpio.gpioNumber
         OutputCommand(ioid, zone, Commands.ON)
@@ -204,7 +204,7 @@ def turn_zone_off(zoneId):
 
     # special case - Zone corresponds to RpiGpio SYSTEM_ENABLED_GPIO
     if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:    
-        TurnIrrigationSystemActiveOff()
+        Turn24VACOff()
     else:
         ioid = rpiGpio.gpioNumber
         OutputCommand(ioid, zone, Commands.OFF)

@@ -52,12 +52,23 @@ def Turn24VACOff():
     # this is the GPIO which enables 24VAC to the valve control relays
     system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
     OutputRpiGpioCommand(system_enabled_rpi_gpio, Commands.OFF)
+    # toggle the IrrigationSystem systemState
+    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+    irrigation_system.systemState = False
+    irrigation_system.save()
+
     
 def Turn24VACOn():
+    # toggle the IrrigationSystem systemState
+    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+    irrigation_system.systemState = True
+    irrigation_system.save()
+
     # this is the GPIO which enables 24VAC to the valve control relays	
     system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
     OutputRpiGpioCommand(system_enabled_rpi_gpio, Commands.ON)
-    
+
+
 def TurnIrrigationSystemActiveOff():
     # get the state of the blue LED output - this is just an indicator that the system is active
     irrigation_system_active_rpi_gpio = \
@@ -80,9 +91,6 @@ def TurnIrrigationSystemActiveOff():
     zone.save()
     TurnAllOutputsOff()
 
-    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
-    irrigation_system.systemState = False
-    irrigation_system.save()
 
 def TurnIrrigationSystemActiveOn():
     # get the state of the blue LED output - this is just an indicator that the system is active
@@ -104,8 +112,5 @@ def TurnIrrigationSystemActiveOn():
     zone.is_on = True
     zone.save()
 
-    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
-    irrigation_system.systemState = True
-    irrigation_system.save()
 
 
