@@ -21,6 +21,14 @@ jQuery(document).ready(function ($) {
             }
         }).done(function (response) {
             if (response.success) {
+                if (response.current_state == 'ON') {
+                    button.removeClass('btn--red');
+                    button.addClass('btn--green');
+                }
+                if (response.current_state == 'OFF') {
+                    button.removeClass('btn--green');
+                    button.addClass('btn--red');
+                }
             }
         }).always(function () {
             button.prop("disabled", false);

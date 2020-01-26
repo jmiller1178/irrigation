@@ -29,13 +29,13 @@ def index(request):
     # latest WeatherCondtion
     current_weather = WeatherCondition.objects.order_by('-id')[0]
     
-    # 1st look for the IrrigationSystem.systemState	
-    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
-    system_enabled = irrigation_system.systemState
+    # 1st look for the IrrigationSystem.systemState
+    system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
+    system_enabled = system_enabled_rpi_gpio.zone.is_on
     
     # next look for the RpiGpio associated to system enabling - this one will enable the 24VAC to the valve control relays
-    system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
-    twentyfour_vac_enabled = system_enabled_rpi_gpio.zone.is_on
+    twentyfour_vac_active_rpi_gpio = RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
+    twentyfour_vac_active = twentyfour_vac_active_rpi_gpio.zone.is_on
     
     return render(request, 
                 'index.html', 
@@ -45,7 +45,7 @@ def index(request):
                   'todays_requests' : todays_requests,
                   'current_weather' : current_weather,
                   'system_enabled' : system_enabled,
-                  'twentyfour_vac_enabled' : twentyfour_vac_enabled,
+                  'twentyfour_vac_enabled' : twentyfour_vac_active,
                 })
                               
                               
