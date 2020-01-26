@@ -36,6 +36,8 @@ class Command(BaseCommand):
             Turn24VACOff()
             # turn off all other outputs
             TurnAllOutputsOff()
+            # turn off the indicator that the system is active - this is the blue LED
+            TurnIrrigationSystemActiveOff()
         else:
             # otherwise
             # turn on 24VAC
@@ -79,6 +81,7 @@ class Command(BaseCommand):
         else:
             # logger.debug("Irrigation System is Disabled")
             TurnAllOutputsOff()
+            TurnIrrigationSystemActiveOff() 
             # cancel all requests which are active or pending
             open_requests = RpiGpioRequest.objects.filter(Q(status=active_status) | Q(status=pending_status))
             if open_requests.count() > 0:
