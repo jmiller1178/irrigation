@@ -192,10 +192,11 @@ def turn_zone_on(zoneId):
     rpiGpio = RpiGpio.objects.get(zone=zone)
     # special case - Zone corresponds to RpiGpio SYSTEM_ENABLED_GPIO
     if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:
-        Turn24VACOn()
+        zone = Turn24VACOn()
     else:
         ioid = rpiGpio.gpioNumber
-        OutputCommand(ioid, zone, Commands.ON)
+        zone = OutputCommand(ioid, zone, Commands.ON)
+    return zone
 
 def turn_zone_off(zoneId):
     # read the Zone info from the database
@@ -204,10 +205,11 @@ def turn_zone_off(zoneId):
 
     # special case - Zone corresponds to RpiGpio SYSTEM_ENABLED_GPIO
     if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:    
-        Turn24VACOff()
+        zone = Turn24VACOff()
     else:
         ioid = rpiGpio.gpioNumber
-        OutputCommand(ioid, zone, Commands.OFF)
+        zone = OutputCommand(ioid, zone, Commands.OFF)
+    return zone
 
 def rpi_gpio_request_cancel(request, id):
     rpiGpioOnRequest = get_object_or_404(RpiGpioRequest, pk=id)
@@ -267,17 +269,17 @@ def toggle_zone(request):
     # read the Zone info from the database
     try:
         zone = Zone.objects.get(pk=zone_id)
-        response['zone_id'] = zone.zoneId
-        response['zone_name'] = zone.displayName
 
         # check to see if it is in an ON state
-        if zone.currentState() == "ON":
-            turn_zone_off(zone_id)
-            response["current_state"] = "OFF"
-        if zone.currentState() == "OFF":   
-            turn_zone_on(zone_id)
-            response["current_state"] = "ON"
-
+        if zone.is_on:
+            zone = turn_zone_off(zone_id)
+        else:   
+            zone = turn_zone_on(zone_id)
+        
+        response['zone_id'] = zone.zoneId
+        response['zone_name'] = zone.displayName
+        response['zone_is_on'] = zone.is_on
+        response["current_state"] = zone.currentState()
         response['success'] = True
 
     except Zone.DoesNotExist:

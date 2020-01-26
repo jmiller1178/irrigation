@@ -6,10 +6,10 @@ from . models import Zone, Schedule, RpiGpio, RpiGpioRequest,IrrigationSchedule
 from . models import WeekDay, Status, IrrigationSystem, ConditionCode, WeatherCondition
 
 class ZoneAdmin(admin.ModelAdmin):
-    list_display = ('displayName', 'locationName', 'enabled', 'is_on', 'visible','sortOrder',)
+    list_display = ('displayName', 'locationName', 'currentState', 'is_on', 'visible','sortOrder',)
     ordering = ('sortOrder',)
-    fields = ('shortName', 'displayName', 'locationName', 'enabled', 'is_on', 'visible','sortOrder',)
-    readonly_fields = ('is_on',)
+    fields = ('shortName', 'displayName', 'locationName','currentState', 'onDisplayText', 'offDisplayText', 'is_on', 'visible', 'sortOrder','enabled',)
+    readonly_fields = ('is_on', 'currentState',)
 
 admin.site.register(Zone, ZoneAdmin)
 

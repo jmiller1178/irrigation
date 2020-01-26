@@ -18,17 +18,18 @@ class Zone(models.Model):
     enabled = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortOrder = models.IntegerField(default=0, blank=False)  
-    is_on = models.BooleanField(default = False)
+    is_on = models.BooleanField(default=False)
     is_on.verbose_name = "Current State"
-    enabledDisplayText = models.CharField(default="On", max_length=255, null=False, blank=True, verbose_name="Text to display when enabled is True")
-    disabledDisplayText = models.CharField(default="Off", max_length=255, null=False, blank=True, verbose_name="Text to display when enabled is False")
+    onDisplayText = models.CharField(default="On", max_length=255, null=False, blank=True, verbose_name="Text to display when ON")
+    offDisplayText = models.CharField(default="Off", max_length=255, null=False, blank=True, verbose_name="Text to display when OFF")
     locationName = models.CharField(max_length=45)
     locationName.verbose_name = "Location"
+    
     def currentState(self):
       if self.is_on:
-        return "ON"
+        return self.onDisplayText
       else:
-        return "OFF"
+        return self.offDisplayText
 
     def __unicode__(self):
       return self.displayName
