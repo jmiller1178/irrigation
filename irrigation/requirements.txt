@@ -13,6 +13,7 @@ django-sass-processor==0.7.4
 django-shell-plus==1.1.7
 djangocms-admin-style==1.4.0
 djangorestframework==3.10.3
+django-sekizai==0.10.0
 GPIOSimulator==0.1
 gunicorn==20.0.4
 httplib2==0.12.1
