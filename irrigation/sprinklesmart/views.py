@@ -190,22 +190,24 @@ def turn_zone_on(zoneId):
     # read the Zone info from the database
     zone = get_object_or_404(Zone, pk=zoneId)
     rpiGpio = RpiGpio.objects.get(zone=zone)
-    ioid = rpiGpio.gpioNumber
-
-    OutputCommand(ioid, zone, Commands.ON)
-
+    # special case - Zone corresponds to RpiGpio SYSTEM_ENABLED_GPIO
+    if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:
+        TurnIrrigationSystemActiveOn()
+    else:
+        ioid = rpiGpio.gpioNumber
+        OutputCommand(ioid, zone, Commands.ON)
 
 def turn_zone_off(zoneId):
     # read the Zone info from the database
     zone = get_object_or_404(Zone, pk=zoneId)
     rpiGpio = RpiGpio.objects.get(zone=zone)
-    ioid = rpiGpio.gpioNumber
 
-    OutputCommand(ioid, zone, Commands.OFF)
-
-
-
-
+    # special case - Zone corresponds to RpiGpio SYSTEM_ENABLED_GPIO
+    if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:    
+        TurnIrrigationSystemActiveOff()
+    else:
+        ioid = rpiGpio.gpioNumber
+        OutputCommand(ioid, zone, Commands.OFF)
 
 def rpi_gpio_request_cancel(request, id):
     rpiGpioOnRequest = get_object_or_404(RpiGpioRequest, pk=id)
