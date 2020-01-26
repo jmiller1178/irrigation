@@ -17,7 +17,7 @@ class Commands(Enum):
     
 def OutputRpiGpioCommand(rpiGpio, command):
     # need the gpioNumber and zone for the OutputCommand below
-    ioid = rpiGpio.gpioNumber
+    ioid = int(rpiGpio.gpioNumber)
     zone = rpiGpio.zone
     zone = OutputCommand(ioid, zone, command)
     return zone
