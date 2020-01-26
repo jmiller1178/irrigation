@@ -1,4 +1,4 @@
-from sprinklesmart.models import RpiGpio, Zone
+from sprinklesmart.models import RpiGpio, Zone, IrrigationSystem
 from enum import Enum
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -80,6 +80,10 @@ def TurnIrrigationSystemActiveOff():
     zone.save()
     TurnAllOutputsOff()
 
+    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+    irrigation_system.systemState = False
+    irrigation_system.save()
+
 def TurnIrrigationSystemActiveOn():
     # get the state of the blue LED output - this is just an indicator that the system is active
     irrigation_system_active_rpi_gpio = \
@@ -99,4 +103,9 @@ def TurnIrrigationSystemActiveOn():
         GPIO.output(ioid, GPIO.HIGH)
     zone.is_on = True
     zone.save()
+
+    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+    irrigation_system.systemState = True
+    irrigation_system.save()
+
 
