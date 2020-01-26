@@ -194,7 +194,7 @@ def turn_zone_on(zoneId):
     if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:
         zone = Turn24VACOn()
     else:
-        ioid = rpiGpio.gpioNumber
+        ioid = int(rpiGpio.gpioNumber)
         zone = OutputCommand(ioid, zone, Commands.ON)
     return zone
 
@@ -207,7 +207,7 @@ def turn_zone_off(zoneId):
     if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:    
         zone = Turn24VACOff()
     else:
-        ioid = rpiGpio.gpioNumber
+        ioid = int(rpiGpio.gpioNumber)
         zone = OutputCommand(ioid, zone, Commands.OFF)
     return zone
 

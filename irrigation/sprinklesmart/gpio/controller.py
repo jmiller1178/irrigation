@@ -84,7 +84,7 @@ def TurnIrrigationSystemActiveOff():
     # get the state of the blue LED output - this is just an indicator that the system is active
     irrigation_system_active_rpi_gpio = \
         RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
-    ioid = irrigation_system_active_rpi_gpio.gpioNumber
+    ioid = int(irrigation_system_active_rpi_gpio.gpioNumber)
     zone = irrigation_system_active_rpi_gpio.zone
     
     if hasattr(GPIO, 'setwarnings'):
@@ -107,7 +107,7 @@ def TurnIrrigationSystemActiveOn():
     # get the state of the blue LED output - this is just an indicator that the system is active
     irrigation_system_active_rpi_gpio = \
         RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
-    ioid = irrigation_system_active_rpi_gpio.gpioNumber
+    ioid = int(irrigation_system_active_rpi_gpio.gpioNumber)
     zone = irrigation_system_active_rpi_gpio.zone
 
     if hasattr(GPIO, 'setwarnings'):

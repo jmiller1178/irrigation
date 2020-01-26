@@ -15,7 +15,7 @@ class Command(BaseCommand):
 	
 	def handle(self, *args, **options):
 		rpi_gpio = RpiGpio.objects.get(gpioName='GPIO27')
-		ioid = rpi_gpio.gpioNumber
+		ioid = int(rpi_gpio.gpioNumber)
 		zone = rpi_gpio.zone
 		OutputCommand(ioid, zone, Commands.OFF)
 		
