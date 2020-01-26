@@ -26,7 +26,7 @@ def OutputCommand(ioid, zone, command):
     # this function actually controls the RPi GPIO outputs
     # and it updates the zone table to indicate when a particular zone goes on or off
     # we can use the zone table to tell which outputs are off
-    logger.debug("OutputCommand ioid: {0} zone: {1} command: {2}").format(ioid, zone, command)
+    logger.debug("OutputCommand ioid: {0} zone: {1} command: {2}".format(ioid, zone, command))
     try:
         if hasattr(GPIO, 'setwarnings'):
             GPIO.setwarnings(False)
@@ -48,7 +48,7 @@ def OutputCommand(ioid, zone, command):
             zone.save()
     except Exception as e:
         logger.error(e)
-        logger.error("OutputCommand ioid: {0} zone: {1} command: {2}").format(ioid, zone, command)
+        logger.error("OutputCommand ioid: {0} zone: {1} command: {2}".format(ioid, zone, command))
     finally:    
         return zone
 
