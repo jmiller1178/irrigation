@@ -40,12 +40,12 @@ class Zone(models.Model):
     @property
     def json(self):
         zone_json = {}
-        zone_json['zone_id'] = self.zoneId
+        zone_json['zone_id'] = str(self.zoneId)
         zone_json['zone_name'] = self.displayName
-        zone_json['zone_is_on'] = self.is_on
+        zone_json['zone_is_on'] = str(self.is_on)
         zone_json['current_state'] = self.currentState()
         zone_json['short_name'] = self.shortName
-        zone_json['visible'] = self.visible
+        zone_json['visible'] = str(self.visible)
         zone_json['location_name'] = self.locationName
         return zone_json
 

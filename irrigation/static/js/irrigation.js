@@ -28,13 +28,20 @@ jQuery(document).ready(function ($) {
             button.find('i').hide();
         });
     });
+
+    $("[data-zone-id]").each(function(zone_button){
+        var zone_id=$(this).attr('data-zone-id');
+        var zone_data = findElement(zone_list, "zone_id", zone_id);
+        console.debug(zone_id); 
+        update_toggle_zone_button(zone_data);
+        });
 });
 
 function update_toggle_zone_button(zone_data) {
     // first we have to find the right element
     // data-zone-id=zoneId
     var zone_button = $("[data-zone-id="+zone_data.zone_id+"]");
-    if (zone_data.zone_is_on){
+    if (zone_data.zone_is_on == "True"){
         zone_button.removeClass('btn--red');
         zone_button.addClass('btn--green');
     } else {

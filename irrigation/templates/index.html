@@ -23,6 +23,7 @@
     <script src="{% static "js/irrigation.js" %}"></script>
   {% endcompress %}
   {% render_block "js" %}
+  <script>var zone_list={{ zone_list|safe }};</script>
 </head>
 <body>
   <div class="navigation">
@@ -51,20 +52,16 @@
           </h1>
           <div class="row">
               <div class="col-1-of-2">
-                {% if system_enabled == True %}
-                  <span class="btn btn--green btn-toggle-zone" data-zone-id="21">System Enabled</span>
-                {% else %}
-                  <span class="btn btn--red btn-toggle-zone" data-zone-id="21">System Disabled</span>
-                {% endif %}
+                <span class="btn btn-toggle-zone" data-zone-id={{ system_enabled_zone_data.zone_id }}>{{ system_enabled_zone_data.current_state }}</span>
               </div>
               <div class="col-2-of-2">
-                {% if twentyfour_vac_active == True %}
-                  <span class="btn btn--green btn-toggle-zone" data-zone-id="22">Valves Enabled</span>
-                {% else %}
-                  <span class="btn btn--red btn-toggle-zone" data-zone-id="22">Valves Disabled</span>
-                {% endif %}
+                <span class="btn btn-toggle-zone" data-zone-id={{ valves_enabled_zone_data.zone_id }}>{{ valves_enabled_zone_data.current_state }}</span>
               </div>
           </div>
+          {% comment %}
+          <script>update_toggle_zone_button({{ system_enabled_zone|safe }});</script>
+          <script>update_toggle_zone_button({{ valves_enabled_zone|safe }});</script>
+          {% endcomment %}
           <div class="row weather-conditions">
             <h3 class="heading-tertiary u-margin-bottom-small">Current Weather Conditions</h3> 
             <p class="paragraph temperature">
@@ -129,23 +126,21 @@
             </thead>
             <tbody>
               {% for zone in zone_list %}
+                {% if zone.visible == 'True' %}
                   <tr>    
-                      <td><a href="/zone_control/{{ zone.zoneId }}" >{{ zone.displayName }}</a></td>
-                      <td>
-                        {% if zone.is_on %}
-                          <img src="{% static 'img/greenlight.jpg' %}" alt="ON" width=19 height=19 />
-                        {% else %}
-                          <img src="{% static 'img/redlight.jpg' %}" alt="OFF" width=15 height=15 />
-                        {% endif %}
-                      </td>
+                    <td>
+                      <span>{{ zone.zone_name }}</span>
+                    </td>
+                    <td>
+                        <span class="btn btn-toggle-zone" data-zone-id={{zone.zone_id}}></span>
+                    </td>
                   </tr>
+                  {% endif %}
                 {% endfor %}
             </tbody>
           </table>
         </div>
       </div>  
     </section>
-
-    
   </main>
 </body>

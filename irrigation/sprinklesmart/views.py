@@ -21,7 +21,13 @@ import json
 # main browser based view for the irrigation website
 # /index.html
 def index(request):
-    zone_list = Zone.objects.filter(visible=True, enabled=True)
+    zones = Zone.objects.filter(enabled=True)
+    zone_list = []
+    zone_list_json = []
+    for zone in zones:
+        zone_list.append(zone.json)
+        zone_list_json.append(json.dumps(zone.json))
+
     current_date = datetime.now()
     todays_requests = RpiGpioRequest.objects.filter(status__in=[1,4],\
     onDateTime__contains=date.today())
@@ -31,11 +37,11 @@ def index(request):
     
     # 1st look for the IrrigationSystem.systemState
     system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
-    system_enabled = system_enabled_rpi_gpio.zone.is_on
+    system_enabled_zone_data = system_enabled_rpi_gpio.zone.json
     
     # next look for the RpiGpio associated to system enabling - this one will enable the 24VAC to the valve control relays
-    twentyfour_vac_active_rpi_gpio = RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
-    twentyfour_vac_active = twentyfour_vac_active_rpi_gpio.zone.is_on
+    valves_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
+    valves_enabled_zone_data = valves_enabled_rpi_gpio.zone.json
     
     return render(request, 
                 'index.html', 
@@ -44,8 +50,8 @@ def index(request):
                   'current_date' : current_date,
                   'todays_requests' : todays_requests,
                   'current_weather' : current_weather,
-                  'system_enabled' : system_enabled,
-                  'twentyfour_vac_enabled' : twentyfour_vac_active,
+                  'system_enabled_zone_data' : system_enabled_zone_data,
+                  'valves_enabled_zone_data' : valves_enabled_zone_data,
                 })
                               
                               
