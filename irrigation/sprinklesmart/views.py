@@ -259,7 +259,7 @@ def get_schedule(request,  scheduleId):
 @require_POST
 def toggle_zone(request):
     response = {}
-    json_data = json.loads(request.body)
+    json_data = json.loads(request.body.decode('utf-8'))
     zone_id = json_data['zoneId']
 
     # read the Zone info from the database
