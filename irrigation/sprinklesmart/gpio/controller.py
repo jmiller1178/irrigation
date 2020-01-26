@@ -2,6 +2,9 @@ from sprinklesmart.models import RpiGpio, Zone, IrrigationSystem
 from enum import Enum
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+import logging
+
+logger = logging.getLogger(__name__)
 
 if settings.GPIO_SIM_ENABLED:
     from RPiSim import GPIO
@@ -23,25 +26,30 @@ def OutputCommand(ioid, zone, command):
     # this function actually controls the RPi GPIO outputs
     # and it updates the zone table to indicate when a particular zone goes on or off
     # we can use the zone table to tell which outputs are off
-    if hasattr(GPIO, 'setwarnings'):
-        GPIO.setwarnings(False)
-    if hasattr(GPIO, 'setmode'):
-        GPIO.setmode(GPIO.BOARD)
-    if hasattr(GPIO, 'setup'):
-        GPIO.setup(ioid, GPIO.OUT)
+    try:
+        if hasattr(GPIO, 'setwarnings'):
+            GPIO.setwarnings(False)
+        if hasattr(GPIO, 'setmode'):
+            GPIO.setmode(GPIO.BOARD)
+        if hasattr(GPIO, 'setup'):
+            GPIO.setup(ioid, GPIO.OUT)
     
-    if command == Commands.ON:
-        if hasattr(GPIO, 'output'):
-            GPIO.output(ioid, GPIO.HIGH)
-        zone.is_on = True
-        zone.save()
+        if command == Commands.ON:
+            if hasattr(GPIO, 'output'):
+                GPIO.output(ioid, GPIO.HIGH)
+            zone.is_on = True
+            zone.save()
      
-    if command == Commands.OFF:
-        if hasattr(GPIO, 'output'):
-            GPIO.output(ioid, GPIO.LOW)
-        zone.is_on = False
-        zone.save()
-    return zone
+        if command == Commands.OFF:
+            if hasattr(GPIO, 'output'):
+                GPIO.output(ioid, GPIO.LOW)
+            zone.is_on = False
+            zone.save()
+    except Exception as e:
+        logger.error(e)
+        logger.error("OutputCommand ioid: {0} zone: {1} command: {2}").format(ioid, zone, command)
+    finally:    
+        return zone
 
 def TurnAllOutputsOff():
     # this function iterates through all defined rpiGpio records
@@ -104,10 +112,10 @@ def TurnIrrigationSystemActiveOn():
     if hasattr(GPIO, 'setwarnings'):
         GPIO.setwarnings(False)
 
-    if hasattr(GPIO,'setmode'):
+    if hasattr(GPIO, 'setmode'):
         GPIO.setmode(GPIO.BOARD)
 
-    if hasattr(GPIO,'setup'):
+    if hasattr(GPIO, 'setup'):
         GPIO.setup(ioid, GPIO.OUT)
     if hasattr(GPIO, 'output'):
         GPIO.output(ioid, GPIO.HIGH)
