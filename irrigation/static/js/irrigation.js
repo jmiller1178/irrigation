@@ -21,7 +21,7 @@ jQuery(document).ready(function ($) {
             }
         }).done(function (response) {
             if (response.success) {
-                update_toggle_zone_button(response.zone)
+                // update_toggle_zone_button(response.zone)
             }
             else{
                 var popup = $(".popup");

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import json
 from datetime import datetime
 from django.db import models
-
+from django.conf import settings
+from rabbitmq.api import RabbitMqApi
 
 class Zone(models.Model):
     class Meta:
@@ -48,6 +50,20 @@ class Zone(models.Model):
         zone_json['visible'] = str(self.visible)
         zone_json['location_name'] = self.locationName
         return zone_json
+
+
+    def publish_zone_change(self):
+        rabbit_mq_api = RabbitMqApi(settings.RABBITMQ_HOST,
+                                  settings.RABBITMQ_USERNAME,
+                                  settings.RABBITMQ_PASSWORD)
+
+        exchange = settings.DEFAULT_AMQ_TOPIC
+        routing_key = "zone"
+        
+        body = json.dumps(self.json)
+        rabbit_mq_api.publish(exchange=exchange,
+                              routing_key=routing_key,
+                              body=body)
 
 # 6/5/2013 JRM - added this class
 class IrrigationSystem(models.Model):

@@ -23,7 +23,7 @@ class RabbitMqApi(object):
             virtual_host="/")
 
         self.connection = pika.BlockingConnection(rabbitmq_params)
-        self.channel =self.connection.channel()
+        self.channel = self.connection.channel()
 
     def __del__(self):
         logger.debug("RabbitMqApi() closing connection and channel")

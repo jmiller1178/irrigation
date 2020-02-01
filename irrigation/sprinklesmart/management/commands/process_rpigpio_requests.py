@@ -33,11 +33,11 @@ class Command(BaseCommand):
         # if it is raining or the irrigation system is disabled
         if current_weather.conditionCode.IsRaining() or not system_enabled:
             # turn off 24VAC
-            turn24VACOff()
+            turn_24_vac_off()
             # turn off all other outputs
-            turnAllOutputsOff()
+            turn_all_outputs_off()
             # turn off the indicator that the system is active - this is the blue LED
-            turnIrrigationSystemActiveOff()
+            turn_irrigation_system_active_off()
         else:
             # otherwise
             # turn on 24VAC

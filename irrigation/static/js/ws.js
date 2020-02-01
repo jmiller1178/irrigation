@@ -20,10 +20,8 @@ jQuery(document).ready(function ($) {
     function on_message(m) {
         console.log('message received');
         console.log(m);
-
-        if (m.body === 'refresh') {
-            window.location.reload();
-        }
+        zone_json = JSON.parse(m.body);
+        update_toggle_zone_button(zone_json);
     }
 
     client.connect(rabbitmq_username, rabbitmq_password, on_connect, on_error, '/');
