@@ -33,11 +33,11 @@ class Command(BaseCommand):
         # if it is raining or the irrigation system is disabled
         if current_weather.conditionCode.IsRaining() or not system_enabled:
             # turn off 24VAC
-            Turn24VACOff()
+            turn24VACOff()
             # turn off all other outputs
-            TurnAllOutputsOff()
+            turnAllOutputsOff()
             # turn off the indicator that the system is active - this is the blue LED
-            TurnIrrigationSystemActiveOff()
+            turnIrrigationSystemActiveOff()
         else:
             # otherwise
             # turn on 24VAC
@@ -58,7 +58,7 @@ class Command(BaseCommand):
             # if there are turn off the output
             if active_requests.count() > 0:
                 for active_request in active_requests:
-                    OutputRpiGpioCommand(active_request.rpiGpio, Commands.OFF)
+                    outputRpiGpioCommand(active_request.rpiGpio, Commands.OFF)
                     active_request.status = complete_status
                     active_request.save()
                     TurnIrrigationSystemActiveOff()
@@ -70,7 +70,7 @@ class Command(BaseCommand):
             # if there are turn on the output
             if pending_requests.count() > 0:
                 for pending_request in pending_requests:
-                    OutputRpiGpioCommand(pending_request.rpiGpio, Commands.ON)
+                    outputRpiGpioCommand(pending_request.rpiGpio, Commands.ON)
                     pending_request.status = active_status
                     pending_request.save()
                     TurnIrrigationSystemActiveOn()

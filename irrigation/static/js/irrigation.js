@@ -23,6 +23,22 @@ jQuery(document).ready(function ($) {
             if (response.success) {
                 update_toggle_zone_button(response.zone)
             }
+            else{
+                var popup = $(".popup");
+                var popup_close = $(".popup__close");
+                popup_close.on('click', function(event){
+                    popup.attr('style','visibility: hidden');
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                    window.scrollTo(0,0);
+                });
+                
+                var popup_text = $(".popup__text");
+                // set the text of the popup
+                popup_text.text(response.error);
+                // show the text of the popup
+                popup.attr('style','visibility: visible');
+            }
         }).always(function () {
             button.prop("disabled", false);
             button.find('i').hide();

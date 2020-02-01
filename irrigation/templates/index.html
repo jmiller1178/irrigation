@@ -52,7 +52,7 @@
           </h1>
           <div class="row">
               <div class="col-1-of-2">
-                <span class="btn btn-toggle-zone" data-zone-id={{ system_enabled_zone_data.zone_id }}>{{ system_enabled_zone_data.current_state }}</span>
+                <span class="btn btn-toggle-zone btn-system-enabled" data-zone-id={{ system_enabled_zone_data.zone_id }}>{{ system_enabled_zone_data.current_state }}</span>
               </div>
               <div class="col-2-of-2">
                 <span class="btn btn-toggle-zone" data-zone-id={{ valves_enabled_zone_data.zone_id }}>{{ valves_enabled_zone_data.current_state }}</span>
@@ -142,5 +142,15 @@
         </div>
       </div>  
     </section>
+    <div class="popup" id="po">
+      <div class="popup__content">
+          <div class="popup__right">
+              <!--<a href="#" class="popup__close">&times;</a>-->
+                <span class="popup__close">&times;</span>
+              <span class="heading-tertiary u-margin-bottom-small popup__text"></span>
+          </div>
+      </div>
+  </div>
+
   </main>
 </body>

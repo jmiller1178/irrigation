@@ -59,16 +59,20 @@ class IrrigationSystem(models.Model):
     systemState = models.BooleanField(db_column="system_state")
     
     def __unicode__(self):
+        state = None
         if self.systemState == True:
-            return "Enabled"
+            state = "Enabled"
         else:
-            return "Disabled"
+            state = "Disabled"
+        return state
 
     def __str__(self):
+        state = None
         if self.systemState == True:
-            return "Enabled"
+            state = "Enabled"
         else:
-            return "Disabled"
+            state = "Disabled"
+        return state
 
 class Status(models.Model):
     class Meta:
@@ -174,7 +178,7 @@ class RpiGpioRequest(models.Model):
         return duration
 
     def remaining(self):
-		
+        
         if datetime.now() > self.offDateTime:
             remaining = 0
         elif datetime.now() > self.onDateTime:
