@@ -73,7 +73,8 @@ def turn_24_vac_off():
     irrigation_system.save()
     # turn off everything - all the zones that is
     turn_all_zone_outputs_off()
-
+    # turn off the irrigation system active (BLUE LED) too
+    turn_irrigation_system_active_off()
     return zone
     
 def turn_24_vac_on():
