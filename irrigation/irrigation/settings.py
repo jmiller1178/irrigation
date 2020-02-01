@@ -35,6 +35,11 @@ IRRIGATION_ACTIVE_GPIO = 'GPIO24'
 
 STATIC_URL = '/static/'
 
+RABBITMQ_HOST = "127.0.0.1"
+RABBITMQ_USERNAME = "webstomp"
+RABBITMQ_PASSWORD = "webstomp"
+RABBITMQ_WS_PORT = "15674"
+DEFAULT_AMQ_TOPIC = 'amq.topic'
 
 # Application definition
 
@@ -55,6 +60,8 @@ INSTALLED_APPS = [
     'compressor',
     'sass_processor',
     'sekizai',  # for JavaScript and CSS management
+    'rabbitmq',
+    
 ]
 
 MIDDLEWARE = [

@@ -39,3 +39,4 @@ typing==3.7.4.1
 urllib3==1.24.2
 wrapt==1.11.2
 yahoo-weather==1.0.7
+pika==0.13.1

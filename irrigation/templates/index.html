@@ -1,4 +1,4 @@
-{% load static compress sekizai_tags sass_tags %}
+{% load static compress sekizai_tags sass_tags settings_tags %}
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <!-- <meta http-equiv="refresh" content="15"> -->
@@ -18,11 +18,22 @@
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
     crossorigin="anonymous">
    </script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" />
+   
    {% compress js %}
     <script src="{% static "js/utility.js" %}"></script>
     <script src="{% static "js/irrigation.js" %}"></script>
+    <script src="{% static "js/ws.js" %}"></script>
   {% endcompress %}
   {% render_block "js" %}
+  <script>
+    var rabbitmq_host = "{% rabbitmq_host %}";
+    var rabbitmq_username = "{% rabbitmq_username %}";
+    var rabbitmq_password = "{% rabbitmq_password %}";
+    var rabbitmq_wss_port = "{% rabbitmq_ws_port %}";
+
+    var rabbitmq_topic = '/topic/sprinklesmart';
+</script>
   <script>var zone_list={{ zone_list|safe }};</script>
 </head>
 <body>
