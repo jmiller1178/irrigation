@@ -85,7 +85,11 @@ class WeatherConditionAdmin(admin.ModelAdmin):
     
 admin.site.register(WeatherCondition, WeatherConditionAdmin)
 
-admin.site.register(IrrigationSystem)
+
+class IrrigationSystemAdmin(admin.ModelAdmin):
+    list_display = ('systemState', 'system_mode',)
+    
+admin.site.register(IrrigationSystem, IrrigationSystemAdmin)
 
 class WeekDayAdmin(admin.ModelAdmin):
     list_display = ('longName', 'shortName', 'weekDay',)
