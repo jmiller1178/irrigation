@@ -65,6 +65,21 @@ class Zone(models.Model):
                               routing_key=routing_key,
                               body=body)
 
+class SystemMode(models.Model):
+    name = models.CharField(max_length=255, null=False, blank=False)
+    short_name  = models.CharField(max_length=1, null=False, blank=False)
+
+    class Meta:
+        db_table = "system_mode"
+        verbose_name = "System Mode"
+        verbose_name_plural = "System Modes"
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
 # 6/5/2013 JRM - added this class
 class IrrigationSystem(models.Model):
     class Meta:
@@ -73,6 +88,7 @@ class IrrigationSystem(models.Model):
         verbose_name_plural = "Irrigation System"
 
     systemState = models.BooleanField(db_column="system_state")
+    system_mode = models.ForeignKey(SystemMode, blank=False, null=False, on_delete=models.PROTECT)
     
     def __unicode__(self):
         state = None

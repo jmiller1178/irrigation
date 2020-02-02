@@ -2,13 +2,15 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from . models import Zone, Schedule, RpiGpio, RpiGpioRequest,IrrigationSchedule
+from . models import Zone, Schedule, RpiGpio, RpiGpioRequest, IrrigationSchedule
 from . models import WeekDay, Status, IrrigationSystem, ConditionCode, WeatherCondition
+from . models import SystemMode
 
 class ZoneAdmin(admin.ModelAdmin):
     list_display = ('displayName', 'locationName', 'currentState', 'is_on', 'visible','sortOrder',)
     ordering = ('sortOrder',)
-    fields = ('shortName', 'displayName', 'locationName','currentState', 'onDisplayText', 'offDisplayText', 'is_on', 'visible', 'sortOrder','enabled',)
+    fields = ('shortName', 'displayName', 'locationName','currentState', 
+              'onDisplayText', 'offDisplayText', 'is_on', 'visible', 'sortOrder','enabled',)
     readonly_fields = ('is_on', 'currentState',)
 
 admin.site.register(Zone, ZoneAdmin)
@@ -42,7 +44,7 @@ admin.site.register(Schedule, ScheduleAdmin)
 class RpiGpioAdmin(admin.ModelAdmin):
     list_display = ('gpioName','gpioNumber','zone')
     fields = ('gpioName', 'gpioNumber','zone')
-    
+
 admin.site.register(RpiGpio, RpiGpioAdmin)
 
 
@@ -72,15 +74,15 @@ admin.site.register(Status, StatusAdmin)
 
         
 class ConditionCodeAdmin(admin.ModelAdmin):
-	list_display = ('description', 'code')
-	ordering = ('code',)
+    list_display = ('description', 'code')
+    ordering = ('code',)
 
 admin.site.register(ConditionCode, ConditionCodeAdmin)
 
 class WeatherConditionAdmin(admin.ModelAdmin):
-	list_display = ('conditionDateTime', 'temperature', 'conditionCode' )
-	ordering = ('-conditionDateTime',)
-	
+    list_display = ('conditionDateTime', 'temperature', 'conditionCode' )
+    ordering = ('-conditionDateTime',)
+    
 admin.site.register(WeatherCondition, WeatherConditionAdmin)
 
 admin.site.register(IrrigationSystem)
@@ -90,3 +92,9 @@ class WeekDayAdmin(admin.ModelAdmin):
     ordering = ('weekDay',)
     
 admin.site.register(WeekDay, WeekDayAdmin)
+
+class SystemModeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'short_name',)
+    ordering = ('name',)
+
+admin.site.register(SystemMode, SystemModeAdmin)
