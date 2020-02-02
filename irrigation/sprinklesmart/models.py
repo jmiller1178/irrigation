@@ -136,8 +136,6 @@ class IrrigationSystem(models.Model):
         self.system_mode = system_mode
         self.save()
         return self
-        
-
 
 class Status(models.Model):
     class Meta:

@@ -31,10 +31,9 @@
     var rabbitmq_username = "{% rabbitmq_username %}";
     var rabbitmq_password = "{% rabbitmq_password %}";
     var rabbitmq_ws_port = "{% rabbitmq_ws_port %}";
-
-    var rabbitmq_topic = '/topic/zone';
 </script>
   <script>var zone_list={{ zone_list|safe }};</script>
+  <script>var irrigation_system={{ irrigation_system|safe }};</script>
 </head>
 <body>
   <div class="navigation">
@@ -67,7 +66,7 @@
           <span class="btn btn-toggle-zone" data-zone-id={{ system_enabled_zone_data.zone_id }}>{{ system_enabled_zone_data.current_state }}</span>
         </div>
         <div class="system-button">
-          <span class="btn btn-toggle-system-mode btn--green">{{ current_system_mode }}</span>
+          <span class="btn btn-toggle-system-mode">System Mode</span>
         </div>
         <div class="system-button">
           <span class="btn btn-toggle-zone" data-zone-id={{ valves_enabled_zone_data.zone_id }}>{{ valves_enabled_zone_data.current_state }}</span>

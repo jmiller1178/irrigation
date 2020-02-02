@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . models import IrrigationSchedule, SystemMode, IrrigationSystem
+from .models import IrrigationSchedule, SystemMode, IrrigationSystem
 
 class IrrigationScheduleSerializer(serializers.ModelSerializer):
     class Meta:

@@ -10,18 +10,26 @@ jQuery(document).ready(function ($) {
     };
 
     var on_connect = function (x) {
-        client.subscribe(rabbitmq_topic, on_message);
+        client.subscribe('/topic/zone', on_zone_message);
+        client.subscribe('/topic/system', on_system_message);
     };
 
     var on_error = function (e) {
         console.log('error', e);
     };
 
-    function on_message(m) {
-        console.log('message received');
+    function on_zone_message(m) {
+        console.log('zone message received');
         console.log(m);
         zone_json = JSON.parse(m.body);
         update_toggle_zone_button(zone_json);
+    }
+
+    function on_system_message(m) {
+        console.log('system message received');
+        console.log(m);
+        system_json = JSON.parse(m.body);
+        update_system_mode_button(system_json);
     }
 
     client.connect(rabbitmq_username, rabbitmq_password, on_connect, on_error, '/');

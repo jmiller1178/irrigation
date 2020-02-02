@@ -14,18 +14,7 @@ jQuery(document).ready(function ($) {
                 }
             }
         }).done(function (response) {
-                // update button color
-            var system_mode_name = response.system_mode['name'];
-            var system_mode_short_name = response.system_mode['short_name'];
-            button.text(system_mode_name);
-            if (system_mode_short_name == "A"){
-                button.removeClass('btn--white');
-                button.addClass('btn--green');
-            } else {
-                button.removeClass('btn--green');
-                button.addClass('btn--white');
-            }
-            
+            //update_system_mode_button(response);
         }).always(function () {
             button.prop("disabled", false);
             button.find('i').hide();
@@ -81,6 +70,7 @@ jQuery(document).ready(function ($) {
         console.debug(zone_id); 
         update_toggle_zone_button(zone_data);
         });
+    update_system_mode_button(irrigation_system);
 });
 
 function update_toggle_zone_button(zone_data) {
@@ -95,4 +85,19 @@ function update_toggle_zone_button(zone_data) {
         zone_button.addClass('btn--red');
     }
     zone_button.text(zone_data.current_state);
+}
+
+function update_system_mode_button(system_data) {
+    var system_mode_button = $(".btn-toggle-system-mode");
+    var system_mode_name = system_data.system_mode['name'];
+    var system_mode_short_name = system_data.system_mode['short_name'];
+    system_mode_button.text(system_mode_name);
+    if (system_mode_short_name == "A"){
+        system_mode_button.removeClass('btn--white');
+        system_mode_button.addClass('btn--green');
+    } else {
+        system_mode_button.removeClass('btn--green');
+        system_mode_button.addClass('btn--white');
+    }
+
 }
