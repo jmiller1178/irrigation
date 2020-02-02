@@ -14,20 +14,18 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         # logger.debug("process_rpigpio_request invoked")
-        
+        irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+
         pending_status = get_object_or_404(Status, pk=1) # 1 is pending
         complete_status = get_object_or_404(Status, pk=2) # 2 is complete
         cancel_status = get_object_or_404(Status, pk=3) # 3 is cancel
         active_status = get_object_or_404(Status, pk=4) # 4 is active
 
-        # this is the GPIO which enables 24VAC to the valve control relays
-        system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
-
         # get the current weatherconditions
         current_weather = WeatherCondition.objects.order_by('-id')[0]
 
         # read the IrrigationSystem.systemState
-        irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+        
         system_enabled = irrigation_system.systemState
         
         # if it is raining or the irrigation system is disabled
@@ -43,7 +41,7 @@ class Command(BaseCommand):
             # turn on 24VAC
             Turn24VACOn()
         
-        twentyfour_vac_enabled = system_enabled_rpi_gpio.zone.is_on
+        twentyfour_vac_enabled = irrigation_system.system_enabled_zone.is_on
 
         if system_enabled and twentyfour_vac_enabled:
             # system is completely enabled

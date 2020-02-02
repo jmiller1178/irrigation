@@ -1,5 +1,5 @@
 import json
-from .models import Zone, IrrigationSystem
+from .models import Zone, IrrigationSystem, RpiGpio
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import IntegrityError
@@ -8,7 +8,7 @@ from rabbitmq.api import RabbitMqApi
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
 from .serializers import IrrigationSystemSerializer
-
+from sprinklesmart.gpio.controller import turn_24_vac_on, turn_24_vac_off
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,6 +22,13 @@ def post_save_Zone(sender, instance, *args, **kwargs):
 
 @receiver(post_save, sender=IrrigationSystem)
 def post_save_IrrigationSystem(sender, instance, *args, **kwargs):
+    irrigation_system = instance
+    # if the irrigation systemState is False we need
+    # to ensure that we shutdown the entire system
+    if irrigation_system.systemState:
+        turn_24_vac_on()
+    else:
+        turn_24_vac_off()
     
     rabbit_mq_api = RabbitMqApi(settings.RABBITMQ_HOST,
                                 settings.RABBITMQ_USERNAME,

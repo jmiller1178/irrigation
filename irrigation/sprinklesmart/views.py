@@ -37,14 +37,11 @@ def index(request):
     current_weather = WeatherCondition.objects.order_by('-id')[0]
     
     # 1st look for the IrrigationSystem.systemState
-    system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
-    system_enabled_zone_data = system_enabled_rpi_gpio.zone.json
-    
-
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
+    system_enabled_zone_data = irrigation_system.system_enabled_zone.json
     
     # next look for the RpiGpio associated to system enabling - this one will enable the 24VAC to the valve control relays
-    valves_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
-    valves_enabled_zone_data = valves_enabled_rpi_gpio.zone.json
+    valves_enabled_zone_data = irrigation_system.valves_enabled_zone.json
     irrigation_system = IrrigationSystem.objects.get(pk=1)
     serializer = IrrigationSystemSerializer(irrigation_system, many=False)
     irrigation_system = json.dumps(serializer.data)
@@ -66,8 +63,7 @@ def dashboard(request):
     active_status = get_object_or_404(Status, pk=4) 
     
     # this is the GPIO which enables 24VAC to the valve control relays
-    system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
-    twentyfour_vac_enabled = system_enabled_rpi_gpio.zone.is_on
+    twentyfour_vac_enabled = irrigation_system.system_enabled_zone.is_on
 
     # get the current weatherconditions
     current_weather = WeatherCondition.objects.order_by('-id')[0]
@@ -151,7 +147,7 @@ def create_schedule(request):
       # 2nd cancel any upcoming scheduled requests for today
       cancel_all_current_requests()
       
-      # need a list of the zones  
+      # need a list of the zones
       zone_list = Zone.objects.filter(visible=True, enabled=True)
       # retrieve the start time from the form field "start_time" and tack on today's date
       startTime = datetime.strptime(str(date.today()) + ' ' + request.POST['start_time'], "%Y-%m-%d %H:%M")
@@ -200,29 +196,34 @@ def cancel_all_current_requests():
 
 
 def turn_zone_on(zoneId):
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
+
     # read the Zone info from the database
     zone = get_object_or_404(Zone, pk=zoneId)
     rpiGpio = RpiGpio.objects.get(zone=zone)
-    # special case - Zone corresponds to RpiGpio SYSTEM_ENABLED_GPIO
-    if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:
-        zone = turn_24_vac_on()
+    # special case - Zone corresponds to IrrigationSystem system_enabled_zone
+    if zone == irrigation_system.system_enabled_zone:
+        irrigation_system.systemState = True
+        irrigation_system.save()
     else:
         ioid = int(rpiGpio.gpioNumber)
         zone = output_command(ioid, zone, Commands.ON)
     return zone
 
 def turn_zone_off(zoneId):
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
     # read the Zone info from the database
     zone = get_object_or_404(Zone, pk=zoneId)
     rpiGpio = RpiGpio.objects.get(zone=zone)
 
-    # special case - Zone corresponds to IRRIGATION_ACTIVE_GPIO
-    if rpiGpio.gpioName == settings.IRRIGATION_ACTIVE_GPIO:
+    # special case - Zone corresponds to IrrigationSystem valves enabled zone
+    if zone == irrigation_system.valves_enabled_zone:
         zone = turn_irrigation_system_active_off()
 
-    # special case - Zone corresponds to RpiGpio SYSTEM_ENABLED_GPIO
-    if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:    
-        zone = turn_24_vac_off()
+    # special case - Zone corresponds to IrrigationSystem system enabled zone
+    if zone == irrigation_system.system_enabled_zone:   
+        irrigation_system.systemState = False
+        irrigation_system.save()
     else:
         ioid = int(rpiGpio.gpioNumber)
         zone = output_command(ioid, zone, Commands.OFF)
@@ -258,29 +259,10 @@ def get_schedule(request, scheduleId):
 
     return JsonResponse(serializer.data, safe=False)
 
-# @require_http_methods(["GET"])
-# def enable_system(request):
-#     TurnIrrigationSystemActiveOn()
-#     return HttpResponseRedirect('/')
-
-# @require_http_methods(["GET"])
-# def disable_system(request):
-#     TurnIrrigationSystemActiveOff()
-#     return HttpResponseRedirect('/')
-
-# @require_http_methods(["GET"])
-# def enable_24VAC(request):
-#     Turn24VACOn()
-#     return HttpResponseRedirect('/')
-
-# @require_http_methods(["GET"])
-# def disable_24VAC(request):
-#     Turn24VACOff()
-#     return HttpResponseRedirect('/')
-
 @require_POST
 def toggle_zone(request):
     response = {}
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
     json_data = json.loads(request.body.decode('utf-8'))
     zone_id = json_data['zoneId']
     success = True
@@ -298,7 +280,7 @@ def toggle_zone(request):
             # unless the zone we're trying to turn on is the one for enabling the
             # irrigation system - in that case we're trying to re-enable the system
             rpiGpio = RpiGpio.objects.get(zone=zone)  
-            if rpiGpio.gpioName == settings.SYSTEM_ENABLED_GPIO:
+            if zone == irrigation_system.system_enabled_zone:
                 zone = turn_zone_on(zone_id)
             elif irrigation_system_enabled():
                 zone = turn_zone_on(zone_id)
@@ -327,7 +309,3 @@ def toggle_system_mode(request):
     serializer = IrrigationSystemSerializer(irrigation_system, many=False)
 
     return JsonResponse(serializer.data, safe=False)
-
-    
-
-

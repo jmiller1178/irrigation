@@ -87,7 +87,8 @@ admin.site.register(WeatherCondition, WeatherConditionAdmin)
 
 
 class IrrigationSystemAdmin(admin.ModelAdmin):
-    list_display = ('systemState', 'system_mode',)
+    list_display = ('system_enabled_zone', 'systemState', 'system_mode',\
+    'valves_enabled_zone',)
     
 admin.site.register(IrrigationSystem, IrrigationSystemAdmin)
 

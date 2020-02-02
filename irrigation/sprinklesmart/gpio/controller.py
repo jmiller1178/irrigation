@@ -64,72 +64,33 @@ def turn_all_zone_outputs_off():
         output_rpi_gpio_command(rpi_gpio, Commands.OFF)
     
 def turn_24_vac_off():
-    # this is the GPIO which enables the entire system
-    system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
-    zone = output_rpi_gpio_command(system_enabled_rpi_gpio, Commands.OFF)
-    # toggle the IrrigationSystem systemState
     irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
-    irrigation_system.systemState = False
-    irrigation_system.save()
-    # turn off everything - all the zones that is
+    system_enabled_rpi_gpio = RpiGpio.objects.get(zone=irrigation_system.system_enabled_zone)
+    zone = output_rpi_gpio_command(system_enabled_rpi_gpio, Commands.OFF)
     turn_all_zone_outputs_off()
-    # turn off the irrigation system active (BLUE LED) too
     turn_irrigation_system_active_off()
     return zone
     
 def turn_24_vac_on():
     # toggle the IrrigationSystem systemState
     irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
-    irrigation_system.systemState = True
-    irrigation_system.save()
-
-    # this is the GPIO which enables 24VAC to the valve control relays
-    system_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.SYSTEM_ENABLED_GPIO)
+    system_enabled_rpi_gpio = RpiGpio.objects.get(zone=irrigation_system.system_enabled_zone)
     zone = output_rpi_gpio_command(system_enabled_rpi_gpio, Commands.ON)
     return zone
 
 def turn_irrigation_system_active_off():
-    # get the state of the blue LED output - this is just an indicator that the system is active
+    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
     irrigation_system_active_rpi_gpio = \
-        RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
-    ioid = int(irrigation_system_active_rpi_gpio.gpioNumber)
-    zone = irrigation_system_active_rpi_gpio.zone
-
-    if hasattr(GPIO, 'setwarnings'):
-        GPIO.setwarnings(False)
-
-    if hasattr(GPIO, 'setmode'):
-        GPIO.setmode(GPIO.BOARD)
-
-    if hasattr(GPIO, 'setup'):
-        GPIO.setup(ioid, GPIO.OUT)
-    
-    if hasattr(GPIO, 'output'):
-        GPIO.output(ioid, GPIO.LOW)
-    zone.is_on = False
-    zone.save()
-    turn_all_zone_outputs_off()
+        RpiGpio.objects.get(zone=irrigation_system.valves_enabled_zone)
+    zone = output_rpi_gpio_command(irrigation_system_active_rpi_gpio, Commands.OFF)
     return zone
 
 def turn_irrigation_system_active_on():
-    # get the state of the blue LED output - this is just an indicator that the system is active
-    irrigation_system_active_rpi_gpio = \
-        RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
-    ioid = int(irrigation_system_active_rpi_gpio.gpioNumber)
-    zone = irrigation_system_active_rpi_gpio.zone
-
-    if hasattr(GPIO, 'setwarnings'):
-        GPIO.setwarnings(False)
-
-    if hasattr(GPIO, 'setmode'):
-        GPIO.setmode(GPIO.BOARD)
-
-    if hasattr(GPIO, 'setup'):
-        GPIO.setup(ioid, GPIO.OUT)
-    if hasattr(GPIO, 'output'):
-        GPIO.output(ioid, GPIO.HIGH)
-    zone.is_on = True
-    zone.save()
+    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
+    if irrigation_system.systemState:
+        irrigation_system_active_rpi_gpio = \
+            RpiGpio.objects.get(zone=irrigation_system.valves_enabled_zone)
+        zone = output_rpi_gpio_command(irrigation_system_active_rpi_gpio, Commands.ON)
     return zone
 
 

@@ -91,13 +91,15 @@ class SystemMode(models.Model):
 
 # 6/5/2013 JRM - added this class
 class IrrigationSystem(models.Model):
+    systemState = models.BooleanField(db_column="system_state")
+    system_mode = models.ForeignKey(SystemMode, blank=False, null=False, on_delete=models.PROTECT)
+    system_enabled_zone = models.ForeignKey(Zone, blank=False, null=False, related_name="system_enabled_zone", on_delete=models.PROTECT)
+    valves_enabled_zone = models.ForeignKey(Zone, blank=False, null=False, related_name="valves_enabled_zone", on_delete=models.PROTECT)
+
     class Meta:
         db_table = "irrigation_system"
         verbose_name = "Irrigation System"
         verbose_name_plural = "Irrigation System"
-
-    systemState = models.BooleanField(db_column="system_state")
-    system_mode = models.ForeignKey(SystemMode, blank=False, null=False, on_delete=models.PROTECT)
     
     def __unicode__(self):
         state = None

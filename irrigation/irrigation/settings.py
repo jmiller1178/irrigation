@@ -24,14 +24,11 @@ SECRET_KEY = '#va$&%c7om&k5=hemp$)@#l%(9-ki#f-(==la6tu(@5kp)1m@$'
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.125', '192.168.1.126','192.168.1.127',]
+
 INTERNAL_IPS = [
-    
     '127.0.0.1',
-    '192.168.1.125', 
-    
+    '192.168.1.125',
 ]
-SYSTEM_ENABLED_GPIO = 'GPIO23'
-IRRIGATION_ACTIVE_GPIO = 'GPIO24'
 
 STATIC_URL = '/static/'
 

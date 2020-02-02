@@ -99,5 +99,4 @@ function update_system_mode_button(system_data) {
         system_mode_button.removeClass('btn--green');
         system_mode_button.addClass('btn--white');
     }
-
 }
