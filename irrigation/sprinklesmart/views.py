@@ -12,7 +12,7 @@ from datetime import datetime, date, timedelta
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
 from sprinklesmart.gpio.controller import *
-from . serializers import IrrigationScheduleSerializer
+from . serializers import IrrigationScheduleSerializer, SystemModeSerializer, IrrigationSystemSerializer
 from django.views.decorators.http import require_http_methods
 from django.http import  JsonResponse
 from django.views.decorators.http import require_GET, require_POST
@@ -42,7 +42,9 @@ def index(request):
     # next look for the RpiGpio associated to system enabling - this one will enable the 24VAC to the valve control relays
     valves_enabled_rpi_gpio = RpiGpio.objects.get(gpioName=settings.IRRIGATION_ACTIVE_GPIO)
     valves_enabled_zone_data = valves_enabled_rpi_gpio.zone.json
-    
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
+    current_system_mode = irrigation_system.system_mode
+
     return render(request, 
                 'index.html', 
                     {
@@ -52,6 +54,7 @@ def index(request):
                     'current_weather' : current_weather,
                     'system_enabled_zone_data' : system_enabled_zone_data,
                     'valves_enabled_zone_data' : valves_enabled_zone_data,
+                    'current_system_mode' : current_system_mode,
                     })
                               
                               
@@ -309,3 +312,19 @@ def toggle_zone(request):
         response['success'] = False
 
     return JsonResponse(response)
+
+@require_POST
+def toggle_system_mode(request):
+    response = {}
+    success = True
+    error = "No Errors"
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
+    irrigation_system = irrigation_system.toggle_system_mode()
+    
+    serializer = IrrigationSystemSerializer(irrigation_system, many=False)
+
+    return JsonResponse(serializer.data, safe=False)
+
+    
+
+

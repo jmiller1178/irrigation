@@ -61,35 +61,32 @@
           <h1 class="heading-primary">
               <span class="heading-primary--main">Sprinklesmart</span>
           </h1>
-          <div class="row">
-              <div class="col-1-of-2">
-                <span class="btn btn-toggle-zone btn-system-enabled" data-zone-id={{ system_enabled_zone_data.zone_id }}>{{ system_enabled_zone_data.current_state }}</span>
-              </div>
-              <div class="col-2-of-2">
-                <span class="btn btn-toggle-zone" data-zone-id={{ valves_enabled_zone_data.zone_id }}>{{ valves_enabled_zone_data.current_state }}</span>
-              </div>
-          </div>
-          {% comment %}
-          <script>update_toggle_zone_button({{ system_enabled_zone|safe }});</script>
-          <script>update_toggle_zone_button({{ valves_enabled_zone|safe }});</script>
-          {% endcomment %}
-          <div class="row weather-conditions">
-            <h3 class="heading-tertiary u-margin-bottom-small">Current Weather Conditions</h3> 
-            <p class="paragraph temperature">
-              As of {{ current_weather.conditionDateTime }} {{ current_weather.conditionCode.description }} and {{ current_weather.temperature|floatformat:0 }}&deg; F
-          </p>
-          {% if current_weather %}
-            <h3 class="heading-tertiary u-margin-bottom-small">
-              {% if current_weather.conditionCode.IsRaining %}
-                <p class="paragraph">It is raining outside</p>
-              {% else %}
-                <p class="paragraph">It is not raining outside</p>
-              {% endif %}
-            </h3>
-          {% endif %}
-          </div>
-          <!---->
-
+      </div>
+      <div class="system-buttons">
+        <div class="system-button">
+          <span class="btn btn-toggle-zone" data-zone-id={{ system_enabled_zone_data.zone_id }}>{{ system_enabled_zone_data.current_state }}</span>
+        </div>
+        <div class="system-button">
+          <span class="btn btn-toggle-system-mode btn--green">{{ current_system_mode }}</span>
+        </div>
+        <div class="system-button">
+          <span class="btn btn-toggle-zone" data-zone-id={{ valves_enabled_zone_data.zone_id }}>{{ valves_enabled_zone_data.current_state }}</span>
+        </div>
+      </div>
+      <div class="row weather-conditions">
+        <h3 class="heading-tertiary u-margin-bottom-small">Current Weather Conditions</h3> 
+        <p class="paragraph temperature">
+          As of {{ current_weather.conditionDateTime }} {{ current_weather.conditionCode.description }} and {{ current_weather.temperature|floatformat:0 }}&deg; F
+        </p>
+        {% if current_weather %}
+          <h3 class="heading-tertiary u-margin-bottom-small">
+            {% if current_weather.conditionCode.IsRaining %}
+              <p class="paragraph">It is raining outside</p>
+            {% else %}
+              <p class="paragraph">It is not raining outside</p>
+            {% endif %}
+          </h3>
+        {% endif %}
       </div>
   </header>
   <main>

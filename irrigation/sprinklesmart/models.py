@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from django.db import models
 from django.conf import settings
+from django.db.models import Q
 from rabbitmq.api import RabbitMqApi
 
 class Zone(models.Model):
@@ -74,6 +75,14 @@ class SystemMode(models.Model):
         verbose_name = "System Mode"
         verbose_name_plural = "System Modes"
 
+    @property
+    def automatic_mode(self):
+        return self.short_name == 'A'
+
+    @property
+    def manual_mode(self):
+        return self.short_name == 'M'
+
     def __unicode__(self):
         return self.name
 
@@ -105,6 +114,30 @@ class IrrigationSystem(models.Model):
         else:
             state = "Disabled"
         return state
+
+    def toggle_system_mode(self):
+        # current mode is Automatic
+        if self.system_mode.automatic_mode:
+            # going from automatic to manual
+            system_mode = SystemMode.objects.get(short_name='M')
+            # need to cancel all open requests here
+            rpi_gpio_on_requests = RpiGpioRequest.objects.filter(Q(status=1) | Q(status=4))
+            cancelled_status = Status.objects.get(pk=3)
+            # cancel the ON requests
+            for rpi_gpio_on_reqest in rpi_gpio_on_requests:
+                rpi_gpio_on_reqest.status = cancelled_status
+                rpi_gpio_on_reqest.save()
+        
+        # current mode is Manual
+        if self.system_mode.manual_mode:
+            # going from manual to automatic
+            system_mode = SystemMode.objects.get(short_name='A')
+
+        self.system_mode = system_mode
+        self.save()
+        return self
+        
+
 
 class Status(models.Model):
     class Meta:

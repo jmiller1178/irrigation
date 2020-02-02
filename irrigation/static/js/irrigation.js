@@ -1,4 +1,37 @@
 jQuery(document).ready(function ($) {
+    $(".btn-toggle-system-mode").on('click', function(){
+        var button = $(this);
+        button.prop("disabled", true);
+        var csrfCookieName = getCookie('csrftoken');
+        $.ajax({
+            type: "POST",
+            url: '/toggle_system_mode/',
+            dataType: "json",
+            contentType: "application/json",
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrfCookieName);
+                }
+            }
+        }).done(function (response) {
+                // update button color
+            var system_mode_name = response.system_mode['name'];
+            var system_mode_short_name = response.system_mode['short_name'];
+            button.text(system_mode_name);
+            if (system_mode_short_name == "A"){
+                button.removeClass('btn--white');
+                button.addClass('btn--green');
+            } else {
+                button.removeClass('btn--green');
+                button.addClass('btn--white');
+            }
+            
+        }).always(function () {
+            button.prop("disabled", false);
+            button.find('i').hide();
+        });
+    });
+
     $(".btn-toggle-zone").on('click', function () {
         var button = $(this);
         button.prop("disabled", true);
@@ -20,10 +53,7 @@ jQuery(document).ready(function ($) {
                 }
             }
         }).done(function (response) {
-            if (response.success) {
-                // update_toggle_zone_button(response.zone)
-            }
-            else{
+            if (!response.success) {
                 var popup = $(".popup");
                 var popup_close = $(".popup__close");
                 popup_close.on('click', function(event){
