@@ -91,12 +91,20 @@ function update_system_mode_button(system_data) {
     var system_mode_button = $(".btn-toggle-system-mode");
     var system_mode_name = system_data.system_mode['name'];
     var system_mode_short_name = system_data.system_mode['short_name'];
+    var automatic_mode_section = $(".section-automatic-mode");
+    var manual_mode_section = $(".section-manual-mode");
+
     system_mode_button.text(system_mode_name);
+
     if (system_mode_short_name == "A"){
         system_mode_button.removeClass('btn--white');
         system_mode_button.addClass('btn--green');
+        automatic_mode_section.show();
+        manual_mode_section.hide();
     } else {
         system_mode_button.removeClass('btn--green');
         system_mode_button.addClass('btn--white');
+        automatic_mode_section.hide();
+        manual_mode_section.show();
     }
 }

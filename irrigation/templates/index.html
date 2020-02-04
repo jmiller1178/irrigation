@@ -89,65 +89,63 @@
       </div>
   </header>
   <main>
-    <section class="section-status">
-      <div class="row">
-        <div class="col-1-of-2">
-          <table class="table table-condensed table-bordered">
-            <thead>
-                <tr>
-                    <th>Zone</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Duration</th>
-                    <th>Remaining</th>
-                    <th>&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for request in todays_requests %}
-                  <tr>    
-                      <td><a href="/zone_control/{{ request.rpiGpio.zone.zoneId }}" >{{ request.rpiGpio.zone.displayName }}</a></td>
-                      <td>{{ request.onTime }}</td>
-                      <td>{{ request.offTime }}</td>
-                      <td>{{ request.duration }}</td>
-                      <td>{{ request.remaining }}</td>
-                      <td>
-                        {% if request.rpiGpio.zone.is_on == True %}
-                          <a href="/rpi_gpio_request_cancel/{{ request.id }}" ><img src="{% static 'img/cancel_button.jpg' %}" alt="cancel" /></a>
-                        {% else %}
-                          &nbsp;
-                        {% endif %}  
-                      </td>
-                  </tr>
-                {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <div class="col-2-of-2">
-          <table class="table table-condensed table-bordered">
-            <thead>
-                <tr>
-                    <th>Zone</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-              {% for zone in zone_list %}
-                {% if zone.visible == 'True' %}
-                  <tr>    
-                    <td>
-                      <span>{{ zone.zone_name }}</span>
-                    </td>
-                    <td>
-                        <span class="btn btn-toggle-zone" data-zone-id={{zone.zone_id}}></span>
-                    </td>
-                  </tr>
-                  {% endif %}
-                {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>  
+    <section class="section-automatic-mode">
+      <table class="table table-condensed table-bordered">
+        <thead>
+            <tr>
+                <th>Zone</th>
+                <th>Location</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration</th>
+                <th>Remaining</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in todays_requests %}
+              <tr>    
+                <td>{{ request.rpiGpio.zone.shortName }}</td>
+                <td>{{ request.rpiGpio.zone.locationName }}</td>
+                <td>{{ request.onTime }}</td>
+                <td>{{ request.offTime }}</td>
+                <td>{{ request.duration|floatformat:"0" }}</td>
+                <td>{{ request.remaining|floatformat:"0" }}</td>
+                <td>
+                  <span class="btn btn-toggle-zone" data-zone-id={{ request.rpiGpio.zone.zoneId}}></span>
+              </td>
+              </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    <section class="section-manual-mode">
+      <table class="table table-condensed table-bordered">
+        <thead>
+            <tr>
+                <th>Zone</th>
+                <th>Location</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for zone in zone_list %}
+            {% if zone.visible == 'True' %}
+              <tr>    
+                <td>
+                  <span>{{ zone.short_name }}</span>
+                </td> 
+                <td>
+                  <span>{{ zone.location_name }}</span>
+                </td>
+                <td>
+                    <span class="btn btn-toggle-zone" data-zone-id={{ zone.zone_id}}></span>
+                </td>
+              </tr>
+              {% endif %}
+            {% endfor %}
+        </tbody>
+      </table>
     </section>
     <div class="popup" id="po">
       <div class="popup__content">
@@ -158,6 +156,5 @@
           </div>
       </div>
   </div>
-
   </main>
 </body>

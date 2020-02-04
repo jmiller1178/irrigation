@@ -1063,7 +1063,7 @@ table {
 .table th,
 .table td {
   padding: 0.47059em;
-  text-align: left;
+  text-align: center;
   border-top: 0.07143em solid #b8b8b8; }
 
 /*  Sets table header font-weight to bold.
@@ -1074,7 +1074,7 @@ table {
 
 /*  Aligns cell text to the top of each cell. */
 .table td {
-  vertical-align: top; }
+  vertical-align: center; }
 
 /*  Removes the border-top from the first row. */
 .table thead:first-child tr th,

@@ -23,7 +23,7 @@ $table-border-width: .071428571em;
 $table-border-style: solid;
 $table-margin-bottom: 1.529411765em;
 $table-cell-padding: .470588235em;
-$table-cell-text-align: left;
+$table-cell-text-align: center;
 $table-cell-border-top: $table-border-width $table-border-style $table-border-color;
 $table-header-font-weight: bold;
 $table-body-border-top: .142857143em $table-border-style $table-border-color;
@@ -119,7 +119,7 @@ table {
 /*  Aligns cell text to the top of each cell. */
 .table td,
 %table td {
-   vertical-align: top;
+   vertical-align: center;
 }
 
 /*  Removes the border-top from the first row. */

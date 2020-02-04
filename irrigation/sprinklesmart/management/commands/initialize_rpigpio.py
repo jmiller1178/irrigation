@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from sprinklesmart.models import RpiGpioRequest, Schedule, WeekDay, Status, WeatherCondition, IrrigationSystem
-from sprinklesmart.gpio.controller import OutputCommand, Commands, TurnAllOutputsOff
+from sprinklesmart.gpio.controller import OutputCommand, Commands, turn_all_outputs_off
 from django.db.models import Q, Min
 import logging
 
@@ -10,4 +10,4 @@ class Command(BaseCommand):
     help = 'Process RPi GPIO Requests'
     
     def handle(self, *args, **options):
-      TurnAllOutputsOff()                  
+      turn_all_outputs_off()                  
