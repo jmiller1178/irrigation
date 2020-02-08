@@ -3,7 +3,6 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^dashboard/', views.dashboard, name='dashboard'),
     url(r'^manually_schedule/', views.manually_schedule, name='manually_schedule'),
     url(r'^create_schedule/', views.create_schedule, name='create_schedule'),
     url(r'^zone_control/(?P<zoneId>\d+)/$', views.zone_control, name='zone_control'),
