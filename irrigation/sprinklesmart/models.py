@@ -280,17 +280,20 @@ class IrrigationSchedule(models.Model):
       return self.displayName()
 
 class ConditionCode(models.Model):
-    class Meta:
-        db_table = "conditionCode"
-        verbose_name = "Condition Code"
-        verbose_name_plural = "Condition Codes"
     code = models.IntegerField(primary_key="True")
     code.verbose_name = "Condition Code"
     description = models.CharField(max_length=50)
     description.verbose_name = "Condition"
 
+    @property
     def IsRaining(self):
-      return self.code in (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 18, 35, 37, 38, 39, 40, 45, 47)
+      return self.code in (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 
+      12, 13, 17, 18, 35, 37, 38, 39, 40, 45, 47)
+
+    class Meta:
+        db_table = "conditionCode"
+        verbose_name = "Condition Code"
+        verbose_name_plural = "Condition Codes"
 
     def __unicode__(self):
         return self.description
@@ -298,11 +301,6 @@ class ConditionCode(models.Model):
         return self.description    
 
 class WeatherCondition(models.Model):
-    class Meta:
-        db_table = "weatherCondition"
-        verbose_name = "Weather Condition"
-        verbose_name_plural = "Weather Conditions"
-        
     title = models.CharField(max_length=512, default='')
     conditionDateTime = models.DateTimeField()
     conditionDateTime.verbose_name = "Date & Time"
@@ -314,8 +312,20 @@ class WeatherCondition(models.Model):
     forecastDay3 = models.CharField(max_length=512, default='')
     forecastDay4 = models.CharField(max_length=512, default='')
     forecastDay5 = models.CharField(max_length=512, default='')
-    
-    
+
+    class Meta:
+        db_table = "weatherCondition"
+        verbose_name = "Weather Condition"
+        verbose_name_plural = "Weather Conditions"
+        
+    @property
+    def raining_message(self):
+        message = ""
+        if self.conditionCode.IsRaining:
+            message = "It is raining outside"
+        else:
+            message = "It is not raining outside"
+        return message
 
 
 

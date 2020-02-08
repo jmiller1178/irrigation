@@ -17,7 +17,7 @@ from datetime import datetime, date, timedelta
 from sprinklesmart.gpio.controller import (turn_zone_on, turn_zone_off, turn_24_vac_off,
  turn_24_vac_on, turn_all_zone_outputs_off, irrigation_system_enabled,
  turn_irrigation_system_active_off, turn_irrigation_system_active_on)
-from . serializers import IrrigationSystemSerializer
+from . serializers import IrrigationSystemSerializer, WeatherConditionSerializer
 
 # main browser based view for the irrigation website
 # /index.html
@@ -29,12 +29,14 @@ def index(request):
         zone_list.append(zone.json)
         zone_list_json.append(json.dumps(zone.json))
 
+    # latest WeatherCondtion
+    current_weather_condition = WeatherCondition.objects.filter().order_by('-id')[0]
+    serializer = WeatherConditionSerializer(current_weather_condition, many=False)
+    current_weather_conditions = json.dumps(serializer.data)
+
     current_date = datetime.now()
     todays_requests = RpiGpioRequest.objects.filter(status__in=[1,4],\
     onDateTime__contains=date.today())
-
-    # latest WeatherCondtion
-    current_weather = WeatherCondition.objects.order_by('-id')[0]
     
     # 1st look for the IrrigationSystem.systemState
     irrigation_system = IrrigationSystem.objects.get(pk=1)
@@ -52,7 +54,7 @@ def index(request):
                     'zone_list' : zone_list,
                     'current_date' : current_date,
                     'todays_requests' : todays_requests,
-                    'current_weather' : current_weather,
+                    'current_weather_conditions' : current_weather_conditions,
                     'system_enabled_zone_data' : system_enabled_zone_data,
                     'valves_enabled_zone_data' : valves_enabled_zone_data,
                     'irrigation_system' : irrigation_system,
@@ -125,7 +127,7 @@ def manually_schedule(request):
     zone_list = Zone.objects.filter(visible=True, enabled=True)
     todays_requests = RpiGpioRequest.objects.filter(status=1, onDateTime__contains=date.today())
     current_time_plus_5_minutes = (datetime.now() + timedelta(minutes=5)).strftime("%H:%M")
-    schedule_list = Schedule.objects.filter(enabled=True)     
+    schedule_list = Schedule.objects.filter(enabled=True)    
     
     return render(request, 
         'manually_schedule.html',

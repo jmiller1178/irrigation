@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import IrrigationSchedule, SystemMode, IrrigationSystem
+from .models import (IrrigationSchedule, SystemMode, IrrigationSystem,
+ConditionCode, WeatherCondition)
 
 class IrrigationScheduleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,3 +18,21 @@ class IrrigationSystemSerializer(serializers.ModelSerializer):
     class Meta:
         model = IrrigationSystem
         fields = '__all__'
+
+class ConditionCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConditionCode
+        fields = '__all__'
+
+"""
+WeatherConditionSerializer
+"""
+class WeatherConditionSerializer(serializers.ModelSerializer):
+    conditionCode = ConditionCodeSerializer(required=True)
+
+    class Meta:
+        model = WeatherCondition
+        fields = ['title', 'conditionDateTime', 'conditionDateTime', 
+        'temperature', 'unitOfMeasure', 'conditionCode', 'forecastDay1',
+        'forecastDay2', 'forecastDay3', 'forecastDay4', 'forecastDay5',
+        'raining_message',]

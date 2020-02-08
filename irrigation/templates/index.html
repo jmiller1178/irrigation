@@ -34,6 +34,7 @@
 </script>
   <script>var zone_list={{ zone_list|safe }};</script>
   <script>var irrigation_system={{ irrigation_system|safe }};</script>
+  <script>var current_weather_conditions={{ current_weather_conditions|safe }};</script>
 </head>
 <body>
   <div class="navigation">
@@ -75,17 +76,14 @@
       <div class="row weather-conditions">
         <h3 class="heading-tertiary u-margin-bottom-small">Current Weather Conditions</h3> 
         <p class="paragraph temperature">
-          As of {{ current_weather.conditionDateTime }} {{ current_weather.conditionCode.description }} and {{ current_weather.temperature|floatformat:0 }}&deg; F
+          As of <span class="condition-date-time"></span>&nbsp;
+          <span class="condition-code-description"></span>&nbsp;and&nbsp;
+          <span class="condition-temperature"></span>&deg;<span class="condition-temperature-uom"></span>
         </p>
-        {% if current_weather %}
           <h3 class="heading-tertiary u-margin-bottom-small">
-            {% if current_weather.conditionCode.IsRaining %}
-              <p class="paragraph">It is raining outside</p>
-            {% else %}
-              <p class="paragraph">It is not raining outside</p>
-            {% endif %}
+            <p class="condition-raining paragraph"></p>
           </h3>
-        {% endif %}
+        
       </div>
   </header>
   <main>

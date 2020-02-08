@@ -12,6 +12,7 @@ jQuery(document).ready(function ($) {
     var on_connect = function (x) {
         client.subscribe('/topic/zone', on_zone_message);
         client.subscribe('/topic/system', on_system_message);
+        client.subscribe('/topic/weather', on_weather_message);
     };
 
     var on_error = function (e) {
@@ -30,6 +31,13 @@ jQuery(document).ready(function ($) {
         console.log(m);
         system_json = JSON.parse(m.body);
         update_system_mode_button(system_json);
+    }
+
+    function on_weather_message(m) {
+        console.log('weather message received');
+        console.log(m);
+        weather_json = JSON.parse(m.body);
+        update_current_weather_conditions(weather_json);
     }
 
     client.connect(rabbitmq_username, rabbitmq_password, on_connect, on_error, '/');

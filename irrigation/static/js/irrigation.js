@@ -71,6 +71,7 @@ jQuery(document).ready(function ($) {
         update_toggle_zone_button(zone_data);
         });
     update_system_mode_button(irrigation_system);
+    update_current_weather_conditions(current_weather_conditions);
 });
 
 function update_toggle_zone_button(zone_data) {
@@ -107,4 +108,20 @@ function update_system_mode_button(system_data) {
         automatic_mode_section.hide();
         manual_mode_section.show();
     }
+}
+
+function update_current_weather_conditions(weather_json) {
+    var condition_date_time = $(".condition-date-time");
+    var condition_code_description = $(".condition-code-description");
+    var condition_temperature = $(".condition-temperature");
+    var condition_temperature_uom = $(".condition-temperature-uom");
+    var condition_raining = $(".condition-raining");
+
+    var conditionDateTime=new Date(weather_json['conditionDateTime']);
+
+    condition_code_description.text(weather_json['conditionCode'].description);
+    condition_date_time.text(conditionDateTime.toLocaleString("en-US"));
+    condition_temperature.text(parseInt (weather_json['temperature']));
+    condition_temperature_uom.text(weather_json['unitOfMeasure']);
+    condition_raining.text(weather_json['raining_message']);
 }
