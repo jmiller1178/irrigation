@@ -1,9 +1,7 @@
 {% load static compress sekizai_tags sass_tags settings_tags %}
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <!-- <meta http-equiv="refresh" content="15"> -->
   <title> Sprinkle Smart</title>
-  <!--<link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">-->
   {% compress css %}
 
   <link type="text/x-scss" href="{% sass_src "sass/main.scss" %}" rel="stylesheet" />
@@ -132,24 +130,8 @@
             </tr>
         </thead>
         <tbody>
-          {% comment %}
-          {% for zone in zone_list %}
-            {% if zone.visible == 'True' %}
-              <tr>    
-                <td>
-                  <span>{{ zone.shortName }}</span>
-                </td> 
-                <td>
-                  <span>{{ zone.locationName }}</span>
-                </td>
-                <td>
-                    <span class="btn btn-toggle-zone" data-zone-id={{ zone.zoneId}}></span>
-                </td>
-              </tr>
-              {% endif %}
-            {% endfor %}
-            {%endcomment%}
-          </tbody>
+          <!-- table rows are dynamically inserted via JS-->
+        </tbody>
       </table>
     </section>
     <!-- end of manual mode content-->

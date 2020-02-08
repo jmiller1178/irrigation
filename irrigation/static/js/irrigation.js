@@ -1,4 +1,11 @@
 jQuery(document).ready(function ($) {
+    //
+    // When page is loaded this code executes once
+    // after that, we rely on RabbitMQ and WebStomp to 
+    // provide data messages with updates for the UI
+    //
+    
+    // insert the table rows for the Manual Section
     var zone_table = $(".zone-table tbody");
     zone_list.forEach(function(zone) { 
         if (zone.visible){
@@ -9,18 +16,22 @@ jQuery(document).ready(function ($) {
         }
     });
 
+    // update the system mode (Manual / Automatic) to reflect current state
     update_system_mode_button(irrigation_system);
 
+    // update the Manual Section zone toggle buttons
     $("[data-zone-id]").each(function(zone_button){
         var zone_id=$(this).attr('data-zone-id');
         var zone_data = findElement(zone_list, "zoneId", zone_id);
         console.debug(zone_id); 
         update_toggle_zone_button(zone_data);
         });
+
+    // update the current weather conditions
     update_current_weather_conditions(current_weather_conditions);
 
 
-
+    // Click handler for the system mode (Manual / Automatic) button
     $(".btn-toggle-system-mode").on('click', function(){
         var button = $(this);
         button.prop("disabled", true);
@@ -36,13 +47,15 @@ jQuery(document).ready(function ($) {
                 }
             }
         }).done(function (response) {
-            //update_system_mode_button(response);
+            
         }).always(function () {
             button.prop("disabled", false);
             button.find('i').hide();
         });
     });
 
+    // click handler for any of the toggle zone buttons
+    // including the System and Valves Enable buttons
     $(".btn-toggle-zone").on('click', function () {
         var button = $(this);
         button.prop("disabled", true);
@@ -65,6 +78,8 @@ jQuery(document).ready(function ($) {
             }
         }).done(function (response) {
             if (!response.success) {
+                // couldn't toggle zone prorably because
+                // the system is completely disabled
                 var popup = $(".popup");
                 var popup_close = $(".popup__close");
                 popup_close.on('click', function(event){
@@ -73,7 +88,7 @@ jQuery(document).ready(function ($) {
                     event.stopImmediatePropagation();
                     window.scrollTo(0,0);
                 });
-                
+                // show the response error in the popup
                 var popup_text = $(".popup__text");
                 // set the text of the popup
                 popup_text.text(response.error);
@@ -88,6 +103,8 @@ jQuery(document).ready(function ($) {
 
 });
 
+// used to update the styles and text on zone toggle buttons
+// including the System and Valves Enable buttons
 function update_toggle_zone_button(zone_data) {
     // first we have to find the right element
     // data-zone-id=zoneId
@@ -102,28 +119,40 @@ function update_toggle_zone_button(zone_data) {
     zone_button.text(zone_data.currentState);
 }
 
+// used to update the styles and text on the system mode button
 function update_system_mode_button(system_data) {
+    // this is the system mode (Manual / Automatic) button
     var system_mode_button = $(".btn-toggle-system-mode");
+      
+    // find the button for System Enable / Disable so 
+    // we can assign it's zone ID
+    var system_enabled_zone = $(".system-enabled-zone");
+    system_enabled_zone.attr('data-zone-id', system_enabled_zone_data.zoneId);
+
+    // find the button for Valves Enable / Disable so
+    // we can assign it's zone ID
+    var valves_enabled_zone = $(".valves-enabled-zone");
+    valves_enabled_zone.attr('data-zone-id', valves_enabled_zone_data.zoneId);
+
+    // set the text on the system mode (Manual / Automatic)
     var system_mode_name = system_data.system_mode['name'];
-    var system_mode_short_name = system_data.system_mode['short_name'];
+    system_mode_button.text(system_mode_name);
+
     var automatic_mode_section = $(".section-automatic-mode");
     var manual_mode_section = $(".section-manual-mode");
 
-    var system_enabled_zone = $(".system-enabled-zone");
-    system_enabled_zone.attr('data-zone-id', system_enabled_zone_data.zoneId);
-    // system_enabled_zone.text(system_enabled_zone_data.currentState);
-    var valves_enabled_zone = $(".valves-enabled-zone");
-    valves_enabled_zone.attr('data-zone-id', valves_enabled_zone_data.zoneId);
-    // valves_enabled_zone.text(valves_enabled_zone_data.currentState);
-
-    system_mode_button.text(system_mode_name);
-
+    // get the current system mode state short name (A or M)
+    var system_mode_short_name = system_data.system_mode['short_name'];
+    // if we're in Automatic mode we want to set the button
+    // to GREEN and show the Automatic section + hide the Manual section
     if (system_mode_short_name == "A"){
         system_mode_button.removeClass('btn--white');
         system_mode_button.addClass('btn--green');
         automatic_mode_section.show();
         manual_mode_section.hide();
     } else {
+        // if we're in Manual mode we want to set the button
+        // to WHITE and show the Manual section + hide the Automatic section
         system_mode_button.removeClass('btn--green');
         system_mode_button.addClass('btn--white');
         automatic_mode_section.hide();
@@ -131,6 +160,7 @@ function update_system_mode_button(system_data) {
     }
 }
 
+// update the text for the current weather conditions
 function update_current_weather_conditions(weather_json) {
     var condition_date_time = $(".condition-date-time");
     var condition_code_description = $(".condition-code-description");
