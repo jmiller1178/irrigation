@@ -6,7 +6,6 @@ urlpatterns = [
     url(r'^manually_schedule/', views.manually_schedule, name='manually_schedule'),
     url(r'^create_schedule/', views.create_schedule, name='create_schedule'),
     url(r'^zone_control/(?P<zoneId>\d+)/$', views.zone_control, name='zone_control'),
-    
     url(r'^rpi_gpio_request_cancel/(?P<id>\d+)/$',  views.rpi_gpio_request_cancel, name='rpi_gpio_request_cancel'),
     url(r'^rpi_gpio_request_cancel_all/', views.rpi_gpio_request_cancel_all, name='rpi_gpio_request_cancel_all'),
     url(r'^m/$', views.mobile_index, name='mobile_index'),

@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import json
 from django.shortcuts import render
-
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.db.models import Q
-from . models import RpiGpioRequest, RpiGpio, Zone, Status,\
-      WeatherCondition, IrrigationSystem, Schedule
-from datetime import datetime, date, timedelta
-from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie
-from sprinklesmart.gpio.controller import *
-
 from django.views.decorators.http import require_http_methods
 from django.http import  JsonResponse
 from django.views.decorators.http import require_GET, require_POST
-import json
+from django.conf import settings
+from django.views.decorators.csrf import ensure_csrf_cookie
+from . models import RpiGpioRequest, RpiGpio, Zone, Status,\
+    WeatherCondition, IrrigationSystem, Schedule
+from datetime import datetime, date, timedelta
+from sprinklesmart.gpio.controller import (turn_zone_on, turn_zone_off, turn_24_vac_off,
+ turn_24_vac_on, turn_all_zone_outputs_off, irrigation_system_enabled,
+ turn_irrigation_system_active_off, turn_irrigation_system_active_on)
 from . serializers import IrrigationSystemSerializer
 
 # main browser based view for the irrigation website
@@ -195,40 +195,6 @@ def cancel_all_current_requests():
         rpiGpioRequest.save()
 
 
-def turn_zone_on(zoneId):
-    irrigation_system = IrrigationSystem.objects.get(pk=1)
-
-    # read the Zone info from the database
-    zone = get_object_or_404(Zone, pk=zoneId)
-    rpiGpio = RpiGpio.objects.get(zone=zone)
-    # special case - Zone corresponds to IrrigationSystem system_enabled_zone
-    if zone == irrigation_system.system_enabled_zone:
-        irrigation_system.systemState = True
-        irrigation_system.save()
-    else:
-        ioid = int(rpiGpio.gpioNumber)
-        zone = output_command(ioid, zone, Commands.ON)
-    return zone
-
-def turn_zone_off(zoneId):
-    irrigation_system = IrrigationSystem.objects.get(pk=1)
-    # read the Zone info from the database
-    zone = get_object_or_404(Zone, pk=zoneId)
-    rpiGpio = RpiGpio.objects.get(zone=zone)
-
-    # special case - Zone corresponds to IrrigationSystem valves enabled zone
-    if zone == irrigation_system.valves_enabled_zone:
-        zone = turn_irrigation_system_active_off()
-
-    # special case - Zone corresponds to IrrigationSystem system enabled zone
-    if zone == irrigation_system.system_enabled_zone:   
-        irrigation_system.systemState = False
-        irrigation_system.save()
-    else:
-        ioid = int(rpiGpio.gpioNumber)
-        zone = output_command(ioid, zone, Commands.OFF)
-    
-    return zone
 
 def rpi_gpio_request_cancel(request, id):
     rpiGpioOnRequest = get_object_or_404(RpiGpioRequest, pk=id)

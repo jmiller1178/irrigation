@@ -56,6 +56,42 @@ def output_command(ioid, zone, command):
     finally:    
         return zone
 
+def turn_zone_on(zoneId):
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
+
+    # read the Zone info from the database
+    zone = get_object_or_404(Zone, pk=zoneId)
+    rpiGpio = RpiGpio.objects.get(zone=zone)
+    # special case - Zone corresponds to IrrigationSystem system_enabled_zone
+    if zone == irrigation_system.system_enabled_zone:
+        irrigation_system.systemState = True
+        irrigation_system.save()
+    else:
+        ioid = int(rpiGpio.gpioNumber)
+        zone = output_command(ioid, zone, Commands.ON)
+    return zone
+
+def turn_zone_off(zoneId):
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
+    # read the Zone info from the database
+    zone = get_object_or_404(Zone, pk=zoneId)
+    rpiGpio = RpiGpio.objects.get(zone=zone)
+
+    # special case - Zone corresponds to IrrigationSystem valves enabled zone
+    if zone == irrigation_system.valves_enabled_zone:
+        zone = turn_irrigation_system_active_off()
+
+    # special case - Zone corresponds to IrrigationSystem system enabled zone
+    if zone == irrigation_system.system_enabled_zone:   
+        irrigation_system.systemState = False
+        irrigation_system.save()
+    else:
+        ioid = int(rpiGpio.gpioNumber)
+        zone = output_command(ioid, zone, Commands.OFF)
+    
+    return zone
+
+
 def turn_all_zone_outputs_off():
     # this function iterates through all defined rpiGpio records
     # and invokes the OutputCommand to turn them all off
