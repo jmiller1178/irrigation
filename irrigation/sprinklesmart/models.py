@@ -8,11 +8,7 @@ from django.db.models import Q
 from rabbitmq.api import RabbitMqApi
 
 class Zone(models.Model):
-    class Meta:
-        db_table = 'zone'
-        verbose_name = 'Zone'
-        verbose_name_plural = "Zones"
-        ordering = ['sortOrder']
+   
     zoneId = models.IntegerField(primary_key="True")
     shortName = models.CharField(max_length=45)
     shortName.verbose_name = "Short Name"
@@ -28,11 +24,11 @@ class Zone(models.Model):
     locationName = models.CharField(max_length=45)
     locationName.verbose_name = "Location"
     
-    def currentState(self):
-      if self.is_on:
-        return self.onDisplayText
-      else:
-        return self.offDisplayText
+    class Meta:
+        db_table = 'zone'
+        verbose_name = 'Zone'
+        verbose_name_plural = "Zones"
+        ordering = ['sortOrder']
 
     def __unicode__(self):
       return self.displayName
@@ -41,31 +37,27 @@ class Zone(models.Model):
         return self.displayName
 
     @property
-    def json(self):
-        zone_json = {}
-        zone_json['zone_id'] = str(self.zoneId)
-        zone_json['zone_name'] = self.displayName
-        zone_json['zone_is_on'] = str(self.is_on)
-        zone_json['current_state'] = self.currentState()
-        zone_json['short_name'] = self.shortName
-        zone_json['visible'] = str(self.visible)
-        zone_json['location_name'] = self.locationName
-        return zone_json
+    def currentState(self):
+      if self.is_on:
+        return self.onDisplayText
+      else:
+        return self.offDisplayText
+
+    
+    # @property
+    # def json(self):
+    #     zone_json = {}
+    #     zone_json['zone_id'] = str(self.zoneId)
+    #     zone_json['zone_name'] = self.displayName
+    #     zone_json['zone_is_on'] = str(self.is_on)
+    #     zone_json['current_state'] = self.currentState()
+    #     zone_json['short_name'] = self.shortName
+    #     zone_json['visible'] = str(self.visible)
+    #     zone_json['location_name'] = self.locationName
+    #     return zone_json
 
 
-    def publish_zone_change(self):
-        rabbit_mq_api = RabbitMqApi(settings.RABBITMQ_HOST,
-                                  settings.RABBITMQ_USERNAME,
-                                  settings.RABBITMQ_PASSWORD)
-
-        exchange = settings.DEFAULT_AMQ_TOPIC
-        routing_key = "zone"
-        
-        body = json.dumps(self.json)
-        rabbit_mq_api.publish(exchange=exchange,
-                              routing_key=routing_key,
-                              body=body)
-
+    
 class SystemMode(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
     short_name  = models.CharField(max_length=1, null=False, blank=False)

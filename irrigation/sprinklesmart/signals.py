@@ -7,7 +7,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from rabbitmq.api import RabbitMqApi
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
-from .serializers import IrrigationSystemSerializer, WeatherConditionSerializer
+from .serializers import (IrrigationSystemSerializer, WeatherConditionSerializer, 
+    ZoneSerializer)
 from sprinklesmart.gpio.controller import turn_24_vac_on, turn_24_vac_off
 
 
@@ -15,18 +16,23 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-RABBIT_MQ_API = RabbitMqApi(settings.RABBITMQ_HOST,
-                            settings.RABBITMQ_USERNAME,
-                            settings.RABBITMQ_PASSWORD)
 EXCHANGE = settings.DEFAULT_AMQ_TOPIC
 
 
 @receiver(post_save, sender=Zone)
-def post_save_Zone(sender, instance, *args, **kwargs):
+def post_save_zone(sender, instance, *args, **kwargs):
     zone = instance
-    logger.info("Zone Save {0}".format(zone.json))
-    zone.publish_zone_change()
+    routing_key = "zone"
+    serializer = ZoneSerializer(zone, many=False)
+    body = json.dumps(serializer.data)
+    rabbit_mq_api = RabbitMqApi(settings.RABBITMQ_HOST,
+                            settings.RABBITMQ_USERNAME,
+                            settings.RABBITMQ_PASSWORD)
 
+
+    rabbit_mq_api.publish(exchange=EXCHANGE,
+                        routing_key=routing_key,
+                        body=body)
 
 @receiver(post_save, sender=IrrigationSystem)
 def post_save_irrigation_system(sender, instance, *args, **kwargs):
@@ -41,10 +47,14 @@ def post_save_irrigation_system(sender, instance, *args, **kwargs):
     routing_key = "system"
     serializer = IrrigationSystemSerializer(instance, many=False)
     body = json.dumps(serializer.data)
-    RABBIT_MQ_API.publish(exchange=EXCHANGE,
-                          routing_key=routing_key,
-                          body=body)
+    rabbit_mq_api = RabbitMqApi(settings.RABBITMQ_HOST,
+                            settings.RABBITMQ_USERNAME,
+                            settings.RABBITMQ_PASSWORD)
 
+
+    rabbit_mq_api.publish(exchange=EXCHANGE,
+                        routing_key=routing_key,
+                        body=body)
 """
 post_save_WeatherConditions
 """
@@ -54,6 +64,11 @@ def post_save_weather_conditions(sender, instance, *args, **kwargs):
     routing_key = "weather"
     serializer = WeatherConditionSerializer(weather_condition, many=False)
     body = json.dumps(serializer.data)
-    RABBIT_MQ_API.publish(exchange=EXCHANGE,
-                          routing_key=routing_key,
-                          body=body)
+    rabbit_mq_api = RabbitMqApi(settings.RABBITMQ_HOST,
+                            settings.RABBITMQ_USERNAME,
+                            settings.RABBITMQ_PASSWORD)
+
+
+    rabbit_mq_api.publish(exchange=EXCHANGE,
+                        routing_key=routing_key,
+                        body=body)

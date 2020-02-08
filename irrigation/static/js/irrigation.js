@@ -1,4 +1,26 @@
 jQuery(document).ready(function ($) {
+    var zone_table = $(".zone-table tbody");
+    zone_list.forEach(function(zone) { 
+        if (zone.visible){
+            var new_zone_row = "<tr><td><span>" + zone.shortName + "</span></td>";
+            new_zone_row += "<td><span>" + zone.locationName + "</span></td>";
+            new_zone_row += "<td><span class=\"btn btn-toggle-zone\" data-zone-id=" + zone.zoneId + "></span></td></tr>";
+            zone_table.append(new_zone_row);
+        }
+    });
+
+    update_system_mode_button(irrigation_system);
+
+    $("[data-zone-id]").each(function(zone_button){
+        var zone_id=$(this).attr('data-zone-id');
+        var zone_data = findElement(zone_list, "zoneId", zone_id);
+        console.debug(zone_id); 
+        update_toggle_zone_button(zone_data);
+        });
+    update_current_weather_conditions(current_weather_conditions);
+
+
+
     $(".btn-toggle-system-mode").on('click', function(){
         var button = $(this);
         button.prop("disabled", true);
@@ -64,28 +86,20 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    $("[data-zone-id]").each(function(zone_button){
-        var zone_id=$(this).attr('data-zone-id');
-        var zone_data = findElement(zone_list, "zone_id", zone_id);
-        console.debug(zone_id); 
-        update_toggle_zone_button(zone_data);
-        });
-    update_system_mode_button(irrigation_system);
-    update_current_weather_conditions(current_weather_conditions);
 });
 
 function update_toggle_zone_button(zone_data) {
     // first we have to find the right element
     // data-zone-id=zoneId
-    var zone_button = $("[data-zone-id="+zone_data.zone_id+"]");
-    if (zone_data.zone_is_on == "True"){
+    var zone_button = $("[data-zone-id="+zone_data.zoneId+"]");
+    if (zone_data.is_on == true){
         zone_button.removeClass('btn--red');
         zone_button.addClass('btn--green');
     } else {
         zone_button.removeClass('btn--green');
         zone_button.addClass('btn--red');
     }
-    zone_button.text(zone_data.current_state);
+    zone_button.text(zone_data.currentState);
 }
 
 function update_system_mode_button(system_data) {
@@ -94,6 +108,13 @@ function update_system_mode_button(system_data) {
     var system_mode_short_name = system_data.system_mode['short_name'];
     var automatic_mode_section = $(".section-automatic-mode");
     var manual_mode_section = $(".section-manual-mode");
+
+    var system_enabled_zone = $(".system-enabled-zone");
+    system_enabled_zone.attr('data-zone-id', system_enabled_zone_data.zoneId);
+    // system_enabled_zone.text(system_enabled_zone_data.currentState);
+    var valves_enabled_zone = $(".valves-enabled-zone");
+    valves_enabled_zone.attr('data-zone-id', valves_enabled_zone_data.zoneId);
+    // valves_enabled_zone.text(valves_enabled_zone_data.currentState);
 
     system_mode_button.text(system_mode_name);
 

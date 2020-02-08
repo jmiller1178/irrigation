@@ -17,17 +17,17 @@ from datetime import datetime, date, timedelta
 from sprinklesmart.gpio.controller import (turn_zone_on, turn_zone_off, turn_24_vac_off,
  turn_24_vac_on, turn_all_zone_outputs_off, irrigation_system_enabled,
  turn_irrigation_system_active_off, turn_irrigation_system_active_on)
-from . serializers import IrrigationSystemSerializer, WeatherConditionSerializer
+from . serializers import (IrrigationSystemSerializer, WeatherConditionSerializer, ZoneSerializer)
+from rest_framework.renderers import JSONRenderer
 
 # main browser based view for the irrigation website
 # /index.html
 def index(request):
     zones = Zone.objects.filter(enabled=True)
-    zone_list = []
-    zone_list_json = []
-    for zone in zones:
-        zone_list.append(zone.json)
-        zone_list_json.append(json.dumps(zone.json))
+    serializer = ZoneSerializer(zones, many=True)
+    
+    zone_list = json.dumps(serializer.data)
+    
 
     # latest WeatherCondtion
     current_weather_condition = WeatherCondition.objects.filter().order_by('-id')[0]
@@ -40,11 +40,13 @@ def index(request):
     
     # 1st look for the IrrigationSystem.systemState
     irrigation_system = IrrigationSystem.objects.get(pk=1)
-    system_enabled_zone_data = irrigation_system.system_enabled_zone.json
+    serializer = ZoneSerializer(irrigation_system.system_enabled_zone, many=False)
+    system_enabled_zone_data = json.dumps(serializer.data)
     
     # next look for the RpiGpio associated to system enabling - this one will enable the 24VAC to the valve control relays
-    valves_enabled_zone_data = irrigation_system.valves_enabled_zone.json
-    irrigation_system = IrrigationSystem.objects.get(pk=1)
+    serializer = ZoneSerializer(irrigation_system.valves_enabled_zone, many=False)
+    valves_enabled_zone_data = json.dumps(serializer.data)
+        
     serializer = IrrigationSystemSerializer(irrigation_system, many=False)
     irrigation_system = json.dumps(serializer.data)
 
@@ -255,8 +257,9 @@ def toggle_zone(request):
             else:
                 error = "Irrigation System NOT Enabled"
                 success = False
-        
-        response['zone'] = zone.json
+    
+        serializer = ZoneSerializer(zone, many=False)
+        response['zone'] = json.dumps(serializer.data)
         response['error'] = error
         response['success'] = success
 
@@ -274,6 +277,11 @@ def toggle_system_mode(request):
     error = "No Errors"
     irrigation_system = IrrigationSystem.objects.get(pk=1)
     irrigation_system = irrigation_system.toggle_system_mode()
+
+    # whenever we toggle from Manual to Automatic (or vice versa)
+    # we need to turn all zones off
+    turn_all_zone_outputs_off()
+
     serializer = IrrigationSystemSerializer(irrigation_system, many=False)
 
     return JsonResponse(serializer.data, safe=False)

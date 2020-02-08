@@ -35,6 +35,8 @@
   <script>var zone_list={{ zone_list|safe }};</script>
   <script>var irrigation_system={{ irrigation_system|safe }};</script>
   <script>var current_weather_conditions={{ current_weather_conditions|safe }};</script>
+  <script>var system_enabled_zone_data={{ system_enabled_zone_data|safe }};</script>
+  <script>var valves_enabled_zone_data={{ valves_enabled_zone_data|safe }};</script>
 </head>
 <body>
   <div class="navigation">
@@ -64,13 +66,13 @@
       </div>
       <div class="system-buttons">
         <div class="system-button">
-          <span class="btn btn-toggle-zone" data-zone-id={{ system_enabled_zone_data.zone_id }}>{{ system_enabled_zone_data.current_state }}</span>
+          <span class="btn btn-toggle-zone system-enabled-zone"></span>
         </div>
         <div class="system-button">
-          <span class="btn btn-toggle-system-mode">System Mode</span>
+          <span class="btn btn-toggle-system-mode"></span>
         </div>
         <div class="system-button">
-          <span class="btn btn-toggle-zone" data-zone-id={{ valves_enabled_zone_data.zone_id }}>{{ valves_enabled_zone_data.current_state }}</span>
+          <span class="btn btn-toggle-zone valves-enabled-zone"></span>
         </div>
       </div>
       <div class="row weather-conditions">
@@ -121,7 +123,7 @@
     <!-- end of auto mode content-->
     <!-- start of manual mode content-->
     <section class="section-manual-mode">
-      <table class="table table-condensed table-bordered">
+      <table class="table table-condensed table-bordered zone-table">
         <thead>
             <tr>
                 <th>Zone</th>
@@ -130,22 +132,24 @@
             </tr>
         </thead>
         <tbody>
+          {% comment %}
           {% for zone in zone_list %}
             {% if zone.visible == 'True' %}
               <tr>    
                 <td>
-                  <span>{{ zone.short_name }}</span>
+                  <span>{{ zone.shortName }}</span>
                 </td> 
                 <td>
-                  <span>{{ zone.location_name }}</span>
+                  <span>{{ zone.locationName }}</span>
                 </td>
                 <td>
-                    <span class="btn btn-toggle-zone" data-zone-id={{ zone.zone_id}}></span>
+                    <span class="btn btn-toggle-zone" data-zone-id={{ zone.zoneId}}></span>
                 </td>
               </tr>
               {% endif %}
             {% endfor %}
-        </tbody>
+            {%endcomment%}
+          </tbody>
       </table>
     </section>
     <!-- end of manual mode content-->
