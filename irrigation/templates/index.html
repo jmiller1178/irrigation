@@ -30,8 +30,9 @@
     var rabbitmq_password = "{% rabbitmq_password %}";
     var rabbitmq_ws_port = "{% rabbitmq_ws_port %}";
 </script>
-  <script>var zone_list={{ zone_list|safe }};</script>
   <script>var irrigation_system={{ irrigation_system|safe }};</script>
+  <script>var zone_list={{ zone_list|safe }};</script>
+  <script>var todays_requests={{ todays_requests|safe }};</script>
   <script>var current_weather_conditions={{ current_weather_conditions|safe }};</script>
   <script>var system_enabled_zone_data={{ system_enabled_zone_data|safe }};</script>
   <script>var valves_enabled_zone_data={{ valves_enabled_zone_data|safe }};</script>
@@ -89,7 +90,7 @@
   <main>
     <!-- start of auto mode content-->
     <section class="section-automatic-mode">
-      <table class="table table-condensed table-bordered">
+      <table class="table table-condensed table-bordered requests-table">
         <thead>
             <tr>
                 <th>Zone</th>
@@ -102,19 +103,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for request in todays_requests %}
-              <tr>    
-                <td>{{ request.rpiGpio.zone.shortName }}</td>
-                <td>{{ request.rpiGpio.zone.locationName }}</td>
-                <td>{{ request.onTime }}</td>
-                <td>{{ request.offTime }}</td>
-                <td>{{ request.duration|floatformat:"0" }}</td>
-                <td>{{ request.remaining|floatformat:"0" }}</td>
-                <td>
-                  <span class="btn btn-toggle-zone" data-zone-id={{ request.rpiGpio.zone.zoneId}}></span>
-              </td>
-              </tr>
-            {% endfor %}
+          <!-- table rows are dynamically inserted via JS-->  
         </tbody>
       </table>
     </section>

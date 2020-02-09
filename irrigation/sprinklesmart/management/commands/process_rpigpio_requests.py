@@ -28,7 +28,7 @@ class Command(BaseCommand):
             current_weather = WeatherCondition.objects.order_by('-id')[0]
 
             # if it is raining or the irrigation system is disabled
-            if current_weather.conditionCode.IsRaining():
+            if current_weather.conditionCode.IsRaining:
                 # turn off 24VAC
                 turn_24_vac_off()
             else:

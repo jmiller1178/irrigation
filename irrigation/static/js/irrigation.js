@@ -16,6 +16,21 @@ jQuery(document).ready(function ($) {
         }
     });
 
+    // insert the table rows for the Automatic Section
+    var requests_table = $(".requests-table tbody");
+    todays_requests.forEach(function(request) {
+        var new_request_row = "<tr>";
+        new_request_row += "<td><span>" + request.rpiGpio.zone.shortName + "</span></td>";
+        new_request_row += "<td><span>" + request.rpiGpio.zone.locationName + "</span></td>;"
+        new_request_row += "<td><span>" + request.on_time + "</span></td>";
+        new_request_row += "<td><span>" + request.off_time + "</span></td>";
+        new_request_row += "<td><span>" + parseInt(request.duration) + "</span></td>";
+        new_request_row += "<td><span>" + parseInt(request.remaining) + "</span></td>";
+        new_request_row += "<td><span class=\"btn btn-toggle-zone\" data-zone-id=" + request.rpiGpio.zone.zoneId + "></span></td></tr>";
+        new_request_row += "</tr>"
+        requests_table.append(new_request_row);
+    });
+
     // update the system mode (Manual / Automatic) to reflect current state
     update_system_mode_button(irrigation_system);
 
@@ -179,5 +194,5 @@ function update_current_weather_conditions(weather_json) {
 
 // update the rpio gpio request passed in
 function update_rpi_gpio_request(rpi_gpio_request_json) {
-    
+
 }

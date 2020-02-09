@@ -13,7 +13,7 @@ jQuery(document).ready(function ($) {
         client.subscribe('/topic/zone', on_zone_message);
         client.subscribe('/topic/system', on_system_message);
         client.subscribe('/topic/weather', on_weather_message);
-        client.subscribe('/topio/rpigpiorequest', on_rpi_gpio_request_message);
+        client.subscribe('/topic/rpigpiorequest', on_rpi_gpio_request_message);
     };
 
     var on_error = function (e) {

@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import json
-from datetime import datetime
+from datetime import datetime, date
 from django.db import models
-from django.conf import settings
 from django.db.models import Q
-from rabbitmq.api import RabbitMqApi
 
 class Zone(models.Model):
     """
@@ -166,7 +163,7 @@ class WeekDay(models.Model):
 
     def __str__(self):
         return self.shortName
-            
+
 class Schedule(models.Model):
     """ 
     Schedule represents a schedule
@@ -216,6 +213,11 @@ class RpiGpio(models.Model):
         """
         return self.zone.displayName + ' ' + self.gpioName
 
+class TodaysRpiGpioRequestManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status__in=[1,4],\
+            onDateTime__contains=date.today())
+
 class RpiGpioRequest(models.Model):
     """
     RpiGpioRequest records are created to schedule a zone (RpiGpio) to turn on and then off
@@ -230,6 +232,8 @@ class RpiGpioRequest(models.Model):
 
     status = models.ForeignKey(Status, db_column="statusId", on_delete=models.PROTECT)
     durationMultiplier = models.FloatField(default=1.0)
+
+    todays_requests = TodaysRpiGpioRequestManager()
 
     class Meta:
         db_table = "rpiGpioRequest"
@@ -286,7 +290,7 @@ class RpiGpioRequest(models.Model):
         return remaining
 
     def __str__(self):
-        return self.rpiGpio.displayName() + ' ' + self.status.displayName + ' ON: ' + str(self.onDateTime) + ' OFF: ' + str(self.offDateTime)
+        return self.rpiGpio.displayName + ' ' + self.status.displayName + ' ON: ' + str(self.onDateTime) + ' OFF: ' + str(self.offDateTime)
   
 class IrrigationSchedule(models.Model):
     """

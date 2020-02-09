@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (IrrigationSchedule, Zone, SystemMode, IrrigationSystem,
-    ConditionCode, WeatherCondition, Status, WeekDay, Schedule, RpiGpioRequest)
+    ConditionCode, WeatherCondition, Status, WeekDay, Schedule, RpiGpio, RpiGpioRequest)
 
 
 class SystemModeSerializer(serializers.ModelSerializer):
@@ -65,17 +65,17 @@ class RpiGpioSerializer(serializers.ModelSerializer):
 class IrrigationScheduleSerializer(serializers.ModelSerializer):
     schedule = ScheduleSerializer(required=True)
     zone = ZoneSerializer(required=True)
-              
+
     class Meta:
         model = IrrigationSchedule
         fields = ['zone', 'weekDays', 'duration', 'sortOrder',  ]
 
 class RpiGpioRequestSerializer(serializers.ModelSerializer):
-    RpiGpio = RpiGpioSerializer(required = True)
-    status = StatusSerializer(required = True)
+    rpiGpio = RpiGpioSerializer(required=True)
+    status = StatusSerializer(required=True)
 
     class Meta:
         model = RpiGpioRequest
         fields = ['onDateTime', 'offDateTime', 'durationMultiplier',
                 'on_date', 'on_time', 'off_date', 'off_time',
-                'duration', 'remaining', ]
+                'duration', 'remaining', 'rpiGpio', 'status', ]

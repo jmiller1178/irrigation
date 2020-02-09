@@ -1,9 +1,0 @@
-<h1>{{ zone.displayName }} - {{ zone.currentState }}</h1>
-
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-<form action="/zone_toggle/{{ zone.zoneId }}/" method="post">
-  {% csrf_token %}
-  <input type="submit" {% if zone.currentState == "OFF" %} value="Turn ON" {% else %} value="Turn OFF" {% endif %}/>
-</form>
-

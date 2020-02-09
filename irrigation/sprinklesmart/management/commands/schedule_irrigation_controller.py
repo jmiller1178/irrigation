@@ -45,10 +45,10 @@ class Command(BaseCommand):
                     schedule_time = datetime(current_time.year, current_time.month, current_time.day, schedule.startTime.hour, schedule.startTime.minute)
                     if schedule_time > current_time:
                         delta_time = schedule_time-current_time
-                        minutes_in_future = (delta_time.seconds * sprinkle_smart_multiplier) / 60
+                        minutes_in_future = delta_time.seconds / 60
                     
-                        if minutes_in_future < 60:
-                            # we're less than an hour away from scheduled start time so need to stup the RpiGpioRequests per that schedule
+                        if minutes_in_future < 480:
+                            # we're less than 8 hours away from scheduled start time so need to stup the RpiGpioRequests per that schedule
                             irrigation_schedules = schedule.irrigationschedule_set.filter(weekDays=week_day).order_by('sortOrder')
                             zone_start_time = datetime(current_time.year, current_time.month, current_time.day, schedule.startTime.hour, schedule.startTime.minute)
 
@@ -80,7 +80,7 @@ class Command(BaseCommand):
         rain_count = 0
         
         for weather_condition in weather_conditions:
-            if weather_condition.conditionCode.IsRaining():
+            if weather_condition.conditionCode.IsRaining:
                 rain_count = rain_count + 1
         
         if total_count > 0:

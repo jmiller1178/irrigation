@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import json
+from datetime import datetime, date, timedelta
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
@@ -11,13 +12,14 @@ from django.http import  JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
-from . models import RpiGpioRequest, RpiGpio, Zone, Status,\
-    WeatherCondition, IrrigationSystem, Schedule
-from datetime import datetime, date, timedelta
+from . models import (RpiGpioRequest, RpiGpio, Zone, Status,\
+    WeatherCondition, IrrigationSystem, Schedule)
+
 from sprinklesmart.gpio.controller import (turn_zone_on, turn_zone_off, turn_24_vac_off,
  turn_24_vac_on, turn_all_zone_outputs_off, irrigation_system_enabled,
  turn_irrigation_system_active_off, turn_irrigation_system_active_on)
-from . serializers import (IrrigationSystemSerializer, WeatherConditionSerializer, ZoneSerializer)
+from . serializers import (IrrigationSystemSerializer, WeatherConditionSerializer, 
+    ZoneSerializer, RpiGpioRequestSerializer)
 from rest_framework.renderers import JSONRenderer
 
 # main browser based view for the irrigation website
@@ -25,82 +27,42 @@ from rest_framework.renderers import JSONRenderer
 def index(request):
     zones = Zone.objects.filter(enabled=True)
     serializer = ZoneSerializer(zones, many=True)
+    zone_list_json = json.dumps(serializer.data)
     
-    zone_list = json.dumps(serializer.data)
-    
-
     # latest WeatherCondtion
     current_weather_condition = WeatherCondition.objects.filter().order_by('-id')[0]
     serializer = WeatherConditionSerializer(current_weather_condition, many=False)
-    current_weather_conditions = json.dumps(serializer.data)
+    current_weather_conditions_json = json.dumps(serializer.data)
 
-    current_date = datetime.now()
-    todays_requests = RpiGpioRequest.objects.filter(status__in=[1,4],\
-    onDateTime__contains=date.today())
-    
-    # 1st look for the IrrigationSystem.systemState
+    todays_requests = RpiGpioRequest.todays_requests.all()
+    serializer = RpiGpioRequestSerializer(todays_requests, many=True)
+    todays_requests_json = json.dumps(serializer.data)
+
     irrigation_system = IrrigationSystem.objects.get(pk=1)
+    serializer = IrrigationSystemSerializer(irrigation_system, many=False)
+    irrigation_system_json = json.dumps(serializer.data)
+
     serializer = ZoneSerializer(irrigation_system.system_enabled_zone, many=False)
-    system_enabled_zone_data = json.dumps(serializer.data)
+    system_enabled_zone_json = json.dumps(serializer.data)
     
     # next look for the RpiGpio associated to system enabling - this one will enable the 24VAC to the valve control relays
     serializer = ZoneSerializer(irrigation_system.valves_enabled_zone, many=False)
-    valves_enabled_zone_data = json.dumps(serializer.data)
-        
+    valves_enabled_zone_json = json.dumps(serializer.data)
+
+
     serializer = IrrigationSystemSerializer(irrigation_system, many=False)
     irrigation_system = json.dumps(serializer.data)
 
-    return render(request, 
-                'index.html', 
-                    {
-                    'zone_list' : zone_list,
-                    'current_date' : current_date,
-                    'todays_requests' : todays_requests,
-                    'current_weather_conditions' : current_weather_conditions,
-                    'system_enabled_zone_data' : system_enabled_zone_data,
-                    'valves_enabled_zone_data' : valves_enabled_zone_data,
-                    'irrigation_system' : irrigation_system,
-                    })
-                              
-                              
-# web browser single zone control view
-# /zone_control.html
-@ensure_csrf_cookie
-def zone_control(request, zoneId):
-    zone = get_object_or_404(Zone, pk=zoneId)
-    active_request = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
-    return render(request, 
-                    'zone_control.html', 
-                    {
-                    'zone': zone,
-                    'active_request' : active_request,
-                    })
+    return render(request, 'index.html',
+                        {
+                            'irrigation_system': irrigation_system_json,
+                            'system_enabled_zone_data' : system_enabled_zone_json,
+                            'valves_enabled_zone_data' : valves_enabled_zone_json,
+                            'zone_list' : zone_list_json,
+                            'todays_requests' : todays_requests_json,
+                            'current_weather_conditions' : current_weather_conditions_json,
+                        })
 
-# main mobile browser based view for the irrigation website
-# /mobile/mobile_index.html
-@ensure_csrf_cookie
-def mobile_index(request):
-    zone_list = Zone.objects.filter(visible=True, enabled=True)
-    active_request = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
-    return render(request,
-                'mobile/mobile_index.html', 
-                    {
-                    'zone_list' : zone_list,
-                    'active_request' : active_request,
-                    })
-
-# mobile browser single zone control view
-# /mobile/mobile_zone_control.html
-@ensure_csrf_cookie
-def mobile_zone_control(request, zoneId):
-    zone = get_object_or_404(Zone, pk=zoneId)
-    active_request = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
-    return render(request, 
-                'mobile/mobile_zone_control.html', 
-                    {
-                    'zone': zone,
-                    'active_request' : active_request,
-                    })
 
 # web browser view invoked when the page for manually scheduling zone activities is loaded
 # /manually_schedule.html
@@ -154,21 +116,25 @@ def create_schedule(request):
 
 
 def turn_all_outputs_off():
-     # if there are any zone outputs currently ON, we should find an active RPiGPIORequest record
-      # with a status of 4 which means "In Progress"
-      active_requests = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
-      current_time_plus_1_minutes = (datetime.now() + timedelta(seconds=15)).strftime("%H:%M")
-      newOffDateTime =  datetime.strptime(str(date.today()) + ' ' + current_time_plus_1_minutes, "%Y-%m-%d %H:%M")
-      for rpiGpioRequest in active_requests:
-          # override the offDateTime value for the "In Progress" request so that it is turned OFF 
-          # by the Daemon
-          rpiGpioRequest.offDateTime = newOffDateTime
-          rpiGpioRequest.save()       
+    """
+    if there are any zone outputs currently ON, we should find an active RPiGPIORequest record
+    with a status of 4 which means "In Progress"
+    """
+    active_requests = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
+    current_time_plus_1_minutes = (datetime.now() + timedelta(seconds=15)).strftime("%H:%M")
+    new_off_date_time =  datetime.strptime(str(date.today()) + ' ' + current_time_plus_1_minutes, "%Y-%m-%d %H:%M")
+    for rpiGpioRequest in active_requests:
+        # override the offDateTime value for the "In Progress" request so that it is turned OFF 
+        # by the Daemon
+        rpiGpioRequest.offDateTime = new_off_date_time
+        rpiGpioRequest.save()       
 
 
 def cancel_all_current_requests():
-    # cancel any upcoming scheduled requests for today
-    # instantiate a Status of "Cancelled"
+    """
+    cancel any upcoming scheduled requests for today
+    instantiate a Status of "Cancelled"
+    """
     cancelled_status = get_object_or_404(Status, pk=3)
     # retrieve all new requests
     todays_requests = RpiGpioRequest.objects.filter(status__in=[1], onDateTime__contains=date.today())
@@ -177,7 +143,6 @@ def cancel_all_current_requests():
     for rpiGpioRequest in todays_requests:
         rpiGpioRequest.status = cancelled_status
         rpiGpioRequest.save()
-
 
 
 def rpi_gpio_request_cancel(request, id):
