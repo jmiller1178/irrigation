@@ -13,6 +13,7 @@ jQuery(document).ready(function ($) {
         client.subscribe('/topic/zone', on_zone_message);
         client.subscribe('/topic/system', on_system_message);
         client.subscribe('/topic/weather', on_weather_message);
+        client.subscribe('/topio/rpigpiorequest', on_rpi_gpio_request_message);
     };
 
     var on_error = function (e) {
@@ -38,6 +39,13 @@ jQuery(document).ready(function ($) {
         console.log(m);
         weather_json = JSON.parse(m.body);
         update_current_weather_conditions(weather_json);
+    }
+
+    function on_rpi_gpio_request_message(m) {
+        console.log('rpio gpio request message received');
+        console.log(m)
+        rpio_gpio_request_json = JSON.parse(m.body);
+        update_rpi_gpio_request(rpio_gpio_request_json);
     }
 
     client.connect(rabbitmq_username, rabbitmq_password, on_connect, on_error, '/');

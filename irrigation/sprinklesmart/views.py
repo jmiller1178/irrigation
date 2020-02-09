@@ -63,26 +63,6 @@ def index(request):
                     })
                               
                               
-def dashboard(request):
-    active_status = get_object_or_404(Status, pk=4) 
-    
-    # this is the GPIO which enables 24VAC to the valve control relays
-    twentyfour_vac_enabled = irrigation_system.system_enabled_zone.is_on
-
-    # get the current weatherconditions
-    current_weather = WeatherCondition.objects.order_by('-id')[0]
-    irrigation_system = get_object_or_404(IrrigationSystem, pk=1)
-    system_enabled = irrigation_system.systemState
-    active_request = RpiGpioRequest.objects.get(status=active_status)
-    return render(request, 
-                'dashboard.html', 
-                    {
-                    'current_weather' : current_weather,
-                    'system_enabled' : system_enabled,
-                    'active_request' : active_request,
-                    'twentyfour_vac_enabled' : twentyfour_vac_enabled,
-                    })
-
 # web browser single zone control view
 # /zone_control.html
 @ensure_csrf_cookie

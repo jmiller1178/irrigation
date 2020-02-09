@@ -176,3 +176,8 @@ function update_current_weather_conditions(weather_json) {
     condition_temperature_uom.text(weather_json['unitOfMeasure']);
     condition_raining.text(weather_json['raining_message']);
 }
+
+// update the rpio gpio request passed in
+function update_rpi_gpio_request(rpi_gpio_request_json) {
+    
+}
