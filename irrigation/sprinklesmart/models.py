@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from datetime import datetime, date
 from django.db import models
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 class Zone(models.Model):
     """
@@ -215,8 +216,24 @@ class RpiGpio(models.Model):
 
 class TodaysRpiGpioRequestManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(status__in=[1,4],\
+        return super().get_queryset().filter(status__in=[1, 4],\
             onDateTime__contains=date.today())
+
+class OffRequestsManager(models.Manager):
+    def get_queryset(self):
+        current_time = datetime.now()
+        match_time = datetime(current_time.year, current_time.month, current_time.day,\
+            current_time.hour, current_time.minute, second=0, microsecond=0)
+        active_status = get_object_or_404(Status, pk=4) # 4 is active
+        return super().get_queryset().filter(status=active_status, offDateTime=match_time)
+
+class PendingRequestsManager(models.Manager):
+    def get_queryset(self):
+        current_time = datetime.now()
+        match_time = datetime(current_time.year, current_time.month, current_time.day, current_time.hour, current_time.minute, second=0, microsecond=0)
+        pending_status = get_object_or_404(Status, pk=1) # 1 is pending
+        return super().get_queryset().filter(status=pending_status, 
+            onDateTime=match_time)
 
 class RpiGpioRequest(models.Model):
     """
@@ -234,6 +251,8 @@ class RpiGpioRequest(models.Model):
     durationMultiplier = models.FloatField(default=1.0)
 
     todays_requests = TodaysRpiGpioRequestManager()
+    off_requests = OffRequestsManager()
+    pending_requests = PendingRequestsManager()
 
     class Meta:
         db_table = "rpiGpioRequest"

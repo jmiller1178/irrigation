@@ -20,12 +20,12 @@ class Command(BaseCommand):
         if irrigation_system.system_mode.automatic_mode and\
             irrigation_system.systemState:
 
-            active_status = get_object_or_404(Status, pk=4) # 4 is active
+            # active_status = get_object_or_404(Status, pk=4) # 4 is active
             pending_status = get_object_or_404(Status, pk=1) # 1 is pending
 
             # Let's start by checking if ANYTHING is scheduled for today because, if there is, then we shouldn't
             # have to execute any of the code below, right??
-            requests = RpiGpioRequest.objects.filter(Q(status=active_status) | Q(status=pending_status), onDateTime__contains=date.today())
+            requests = RpiGpioRequest.pending_requests.all()
         
             if requests.count() == 0:
                 # there is nothing scheduled for today so do the scheduling process

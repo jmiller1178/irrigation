@@ -2,7 +2,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from sprinklesmart.models import *
+from sprinklesmart.models import RpiGpioRequest, IrrigationSystem, Status, WeatherCondition
 from sprinklesmart.gpio.controller import *
 from django.db.models import Q
 
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         if irrigation_system.system_mode.automatic_mode and\
             irrigation_system.systemState:
 
-            pending_status = get_object_or_404(Status, pk=1) # 1 is pending
+            # pending_status = get_object_or_404(Status, pk=1) # 1 is pending
             complete_status = get_object_or_404(Status, pk=2) # 2 is complete
             active_status = get_object_or_404(Status, pk=4) # 4 is active
 
@@ -39,7 +39,7 @@ class Command(BaseCommand):
             match_time = datetime(current_time.year, current_time.month, current_time.day, current_time.hour, current_time.minute, second=0, microsecond=0)
                         
             # are there any active requests whith the off time equal to now (to the minute)
-            off_requests = RpiGpioRequest.objects.filter(status=active_status, offDateTime=match_time)
+            off_requests = RpiGpioRequest.off_requests.all()
 
             # if there are turn off the output
             if off_requests.count() > 0:
@@ -49,7 +49,7 @@ class Command(BaseCommand):
                     off_request.save()
                     
             # are there any pending requests with the on time equal to now (to the minute)
-            pending_on_requests = RpiGpioRequest.objects.filter(status=pending_status, onDateTime=match_time)
+            pending_on_requests = RpiGpioRequest.pending_requests.all()
 
             # if there are turn on the output
             if pending_on_requests.count() > 0:
