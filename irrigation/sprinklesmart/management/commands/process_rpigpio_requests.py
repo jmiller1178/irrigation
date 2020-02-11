@@ -44,7 +44,7 @@ class Command(BaseCommand):
             # if there are turn off the output
             if off_requests.count() > 0:
                 for off_request in off_requests:
-                    output_rpi_gpio_command(off_requests.rpiGpio, Commands.OFF)
+                    output_rpi_gpio_command(off_request.rpiGpio, Commands.OFF)
                     off_request.status = complete_status
                     off_request.save()
                     
