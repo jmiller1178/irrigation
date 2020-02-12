@@ -69,7 +69,7 @@ def index(request):
 @ensure_csrf_cookie
 def manually_schedule(request):
     zone_list = Zone.objects.filter(visible=True, enabled=True)
-    todays_requests = RpiGpioRequest.objects.filter(status=1, onDateTime__contains=date.today())
+    todays_requests = RpiGpioRequest.todays_requests.all()
     current_time_plus_5_minutes = (datetime.now() + timedelta(minutes=5)).strftime("%H:%M")
     schedule_list = Schedule.objects.filter(enabled=True)    
     

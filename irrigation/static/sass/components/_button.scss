@@ -58,6 +58,20 @@
             background-color: $color-red;
         }
     }
+    &--grey {
+        background-color: $color-grey-dark;
+        color: $color-white;
+        &::after {
+            background-color: $color-grey-dark;
+        }
+    }
+    &--yellow {
+        background-color: $color-yellow;
+        color: $color-black;
+        &::after {
+            background-color: $color-yellow;
+        }
+    }
     
     &::after {
         content: "";

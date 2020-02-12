@@ -286,6 +286,18 @@ body {
   .btn--red::after {
     background-color: #ff0000a4; }
 
+.btn--grey {
+  background-color: #777;
+  color: #fff; }
+  .btn--grey::after {
+    background-color: #777; }
+
+.btn--yellow {
+  background-color: #ffff00;
+  color: #000; }
+  .btn--yellow::after {
+    background-color: #ffff00; }
+
 .btn::after {
   content: "";
   display: inline-block;

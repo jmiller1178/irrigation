@@ -338,7 +338,7 @@ class IrrigationSchedule(models.Model):
         return self.schedule.displayName + ' ' + self.zone.displayName
 
     def __str__(self):
-      return self.displayName()
+      return self.displayName
 
 class ConditionCode(models.Model):
     """

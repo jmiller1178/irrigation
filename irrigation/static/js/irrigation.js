@@ -18,6 +18,9 @@ jQuery(document).ready(function ($) {
 
     // insert the table rows for the Automatic Section
     var requests_table = $(".requests-table tbody");
+
+    requests_table.empty();
+
     todays_requests.forEach(function(request) {
         var new_request_row = "<tr>";
         new_request_row += "<td><span>" + request.rpiGpio.zone.shortName + "</span></td>";
@@ -26,7 +29,8 @@ jQuery(document).ready(function ($) {
         new_request_row += "<td><span>" + request.off_time + "</span></td>";
         new_request_row += "<td><span>" + parseInt(request.duration) + "</span></td>";
         new_request_row += "<td><span>" + parseInt(request.remaining) + "</span></td>";
-        new_request_row += "<td><span class=\"btn btn-toggle-zone\" data-zone-id=" + request.rpiGpio.zone.zoneId + "></span></td></tr>";
+        new_request_row += "<td><span class=\"btn btn-toggle-zone\" data-request-zone-id="
+        new_request_row += request.rpiGpio.zone.zoneId + ">" + request.status.shortName + "</span></td></tr>";
         new_request_row += "</tr>"
         requests_table.append(new_request_row);
     });
@@ -38,9 +42,19 @@ jQuery(document).ready(function ($) {
     $("[data-zone-id]").each(function(zone_button){
         var zone_id=$(this).attr('data-zone-id');
         var zone_data = findElement(zone_list, "zoneId", zone_id);
-        console.debug(zone_id); 
+        // console.debug(zone_id); 
         update_toggle_zone_button(zone_data);
         });
+
+    $("[data-request-zone-id]").each(function(request_zone_button){
+        var request_zone_id=$(this).attr('data-request-zone-id');
+        todays_requests.forEach(function(request) {
+            if (request_zone_id == request.rpiGpio.zone.zoneId){
+                // we found the right data
+                update_request_zone_button(request);
+            }
+        });
+    });
 
     // update the current weather conditions
     update_current_weather_conditions(current_weather_conditions);
@@ -134,6 +148,33 @@ function update_toggle_zone_button(zone_data) {
     zone_button.text(zone_data.currentState);
 }
 
+function update_request_zone_button(request_zone_data) {
+    console.debug(request_zone_data);
+    var request_zone_button = $("[data-request-zone-id=" + request_zone_data.rpiGpio.zone.zoneId + "]");
+    request_zone_button.removeClass('btn--red'); // Complete
+    request_zone_button.removeClass('btn--green'); // Active
+    request_zone_button.removeClass('btn--grey'); // Cancelled
+    request_zone_button.removeClass('btn--yellow'); // Pending
+
+    switch (request_zone_data.status.statusId) {
+        case 1:
+            request_zone_button.addClass('btn--yellow');
+            break;
+        case 2: 
+            request_zone_button.addClass('btn--red');
+            break;
+        case 3: 
+            request_zone_button.addClass('btn--grey');
+            break;
+        case 4:
+            request_zone_button.addClass('btn--green');
+            break;
+    }
+
+
+    request_zone_button.text(request_zone_data.status.shortName);
+}
+
 // used to update the styles and text on the system mode button
 function update_system_mode_button(system_data) {
     // this is the system mode (Manual / Automatic) button
@@ -194,5 +235,5 @@ function update_current_weather_conditions(weather_json) {
 
 // update the rpio gpio request passed in
 function update_rpi_gpio_request(rpi_gpio_request_json) {
-
+    update_request_zone_button(rpi_gpio_request_json);
 }
