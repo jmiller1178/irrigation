@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^get_schedule/(?P<scheduleId>\d+)/$',  views.get_schedule, name='get_schedule'),
     url(r'^toggle_zone/$', views.toggle_zone, name='toggle_zone'),
     url(r'^toggle_system_mode/$', views.toggle_system_mode, name='toggle_system_mode'),
+    url(r'^toggle_zone_request/$', views.toggle_zone_request, name='toggle_zone_request'),
 ]

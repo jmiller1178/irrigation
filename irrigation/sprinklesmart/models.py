@@ -235,6 +235,13 @@ class PendingRequestsManager(models.Manager):
         return super().get_queryset().filter(status=pending_status, 
             onDateTime=match_time)
 
+class PendingOrActiveRequestManager(models.Manager):
+    def get_queryset(self):
+        pending_status = get_object_or_404(Status, pk=1) # 1 is pending
+        active_status = get_object_or_404(Status, pk=4) # 4 is active
+
+        return super().get_queryset().filter(Q(status=pending_status) | Q(status=active_status))
+
 class RpiGpioRequest(models.Model):
     """
     RpiGpioRequest records are created to schedule a zone (RpiGpio) to turn on and then off
@@ -253,6 +260,7 @@ class RpiGpioRequest(models.Model):
     todays_requests = TodaysRpiGpioRequestManager()
     off_requests = OffRequestsManager()
     pending_requests = PendingRequestsManager()
+    pending_or_active_requests = PendingOrActiveRequestManager()
 
     class Meta:
         db_table = "rpiGpioRequest"

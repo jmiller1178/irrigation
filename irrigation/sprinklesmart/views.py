@@ -217,9 +217,6 @@ def toggle_zone(request):
 
 @require_POST
 def toggle_system_mode(request):
-    response = {}
-    success = True
-    error = "No Errors"
     irrigation_system = IrrigationSystem.objects.get(pk=1)
     irrigation_system = irrigation_system.toggle_system_mode()
 
@@ -228,5 +225,22 @@ def toggle_system_mode(request):
     turn_all_zone_outputs_off()
 
     serializer = IrrigationSystemSerializer(irrigation_system, many=False)
+
+    return JsonResponse(serializer.data, safe=False)
+
+@require_POST
+def toggle_zone_request(request):
+    json_data = json.loads(request.body.decode('utf-8'))
+    zone_id = json_data['zoneId']
+
+    cancelled_status = Status.objects.get(pk=3) # 3 is Cancel
+    
+    rpi_gpio_on_requests = RpiGpioRequest.pending_or_active_requests.filter(rpiGpio__zone__zoneId=zone_id)
+    for rpi_gpio_on_request in rpi_gpio_on_requests:
+        # cancel the ON request
+        rpi_gpio_on_request.status = cancelled_status
+        rpi_gpio_on_request.save()
+    
+    serializer = RpiGpioRequestSerializer(rpi_gpio_on_requests, many=True)
 
     return JsonResponse(serializer.data, safe=False)
