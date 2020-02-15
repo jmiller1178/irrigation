@@ -29,7 +29,7 @@ jQuery(document).ready(function ($) {
         new_request_row += "<td><span>" + request.off_time + "</span></td>";
         new_request_row += "<td><span>" + parseInt(request.duration) + "</span></td>";
         new_request_row += "<td><span>" + parseInt(request.remaining) + "</span></td>";
-        new_request_row += "<td><span class=\"btn btn-toggle-zone\" data-request-zone-id="
+        new_request_row += "<td><span class=\"btn btn-toggle-zone-request\" data-request-zone-id="
         new_request_row += request.rpiGpio.zone.zoneId + ">" + request.status.shortName + "</span></td></tr>";
         new_request_row += "</tr>"
         requests_table.append(new_request_row);
@@ -83,6 +83,7 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Manual Mode Buttons Click Handler
     // click handler for any of the toggle zone buttons
     // including the System and Valves Enable buttons
     $(".btn-toggle-zone").on('click', function () {
@@ -107,7 +108,7 @@ jQuery(document).ready(function ($) {
             }
         }).done(function (response) {
             if (!response.success) {
-                // couldn't toggle zone prorably because
+                // couldn't toggle zone probably because
                 // the system is completely disabled
                 var popup = $(".popup");
                 var popup_close = $(".popup__close");
@@ -130,6 +131,59 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Automatic Mode Buttons Click Handler
+    // click handler for any of the toggle zone request buttons
+    // including the System and Valves Enable buttons
+    $(".btn-toggle-zone-request").on('click', function () {
+        var button = $(this);
+        button.prop("disabled", true);
+
+        var csrfCookieName = getCookie('csrftoken');
+        var zoneId = button.attr('data-request-zone-id');
+
+        var popup = $(".popup-confirm");
+
+        // close the popup
+        var popup_close = $(".btn-confirm-no");
+        popup_close.on('click', function(event){
+            popup.attr('style','visibility: hidden');
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            window.scrollTo(0,0);
+        });
+        // show the response error in the popup
+        var popup_text = $(".popup__text");
+        // set the text of the popup
+        popup_text.text("Cancel " + button.text() + " Request?");
+        // show the text of the popup
+        popup.attr('style','visibility: visible');
+
+        var button_confirm_yes = $(".btn-confirm-yes");
+        button_confirm_yes.on('click', function(event){
+            popup.attr('style','visibility: hidden');
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            $.ajax({
+                type: "POST",
+                url: '/toggle_zone_request/',
+                dataType: "json",
+                data: JSON.stringify({
+                    zoneId: zoneId,
+                }),
+                contentType: "application/json",
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrfCookieName);
+                    }
+                }
+            }).done(function (response) {
+                
+            }).always(function () {
+                button.prop("disabled", false);
+                button.find('i').hide();
+            });
+        });
+    });
 });
 
 // used to update the styles and text on zone toggle buttons
@@ -157,16 +211,18 @@ function update_request_zone_button(request_zone_data) {
     request_zone_button.removeClass('btn--yellow'); // Pending
 
     switch (request_zone_data.status.statusId) {
-        case 1:
+        case 1: // Pending
             request_zone_button.addClass('btn--yellow');
             break;
-        case 2: 
+        case 2:  // Complete
             request_zone_button.addClass('btn--red');
+            request_zone_button.attr('style','pointer-events: none');
             break;
-        case 3: 
+        case 3: // Cancelled
             request_zone_button.addClass('btn--grey');
+            request_zone_button.attr('style','pointer-events: none');
             break;
-        case 4:
+        case 4: // Active
             request_zone_button.addClass('btn--green');
             break;
     }

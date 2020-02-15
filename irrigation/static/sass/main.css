@@ -253,7 +253,6 @@ body {
   transition: all .2s;
   position: relative;
   font-size: 1.6rem;
-  border: none;
   cursor: pointer; }
 
 .btn:hover {
@@ -332,6 +331,9 @@ body {
 .btn-text:active {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   transform: translateY(0); }
+
+.btn-confirm {
+  margin: 1rem; }
 
 .card {
   perspective: 150rem;
@@ -635,7 +637,6 @@ body {
     background-color: #fff;
     box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.2);
     border-radius: 3px;
-    display: table;
     overflow: hidden;
     transition: all .5s .2s;
     opacity: 1;
@@ -678,6 +679,82 @@ body {
     line-height: 1;
     cursor: pointer; }
     .popup__close:hover {
+      color: #55c57a; }
+
+.popup-confirm {
+  height: 100vh;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  opacity: 0;
+  transition: all .3s;
+  visibility: hidden;
+  opacity: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #333; }
+  @supports (-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px)) {
+    .popup-confirm {
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      background-color: rgba(0, 0, 0, 0.3); } }
+  .popup-confirm__content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75%;
+    background-color: #fff;
+    box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    display: table;
+    overflow: hidden;
+    transition: all .5s .2s;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1); }
+  .popup-confirm__left {
+    width: 33.333333%;
+    display: table-cell; }
+  .popup-confirm__right {
+    width: 66.6666667%;
+    display: table-cell;
+    vertical-align: middle;
+    padding: 3rem 5rem; }
+  .popup-confirm__img {
+    display: block;
+    width: 100%; }
+  .popup-confirm__text {
+    font-size: 1.6rem;
+    margin-bottom: 4rem;
+    display: block;
+    text-align: center;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto; }
+  .popup-confirm__confirm {
+    color: #000; }
+  .popup-confirm:target {
+    opacity: 1;
+    visibility: visible; }
+  .popup-confirm:target .popup-confirm__content {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1); }
+  .popup-confirm__close {
+    color: #777;
+    position: absolute;
+    top: 2.5rem;
+    right: 2.5rem;
+    font-size: 3rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: all .2s;
+    line-height: 1;
+    cursor: pointer; }
+    .popup-confirm__close:hover {
       color: #55c57a; }
 
 .story {
