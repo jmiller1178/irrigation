@@ -216,8 +216,8 @@ class RpiGpio(models.Model):
 
 class TodaysRpiGpioRequestManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(status__in=[1, 4],\
-            onDateTime__contains=date.today())
+        return super().get_queryset().filter(
+            onDateTime__contains=date.today()).order_by('onDateTime')
 
 class OffRequestsManager(models.Manager):
     def get_queryset(self):
@@ -232,7 +232,7 @@ class PendingRequestsManager(models.Manager):
         current_time = datetime.now()
         match_time = datetime(current_time.year, current_time.month, current_time.day, current_time.hour, current_time.minute, second=0, microsecond=0)
         pending_status = get_object_or_404(Status, pk=1) # 1 is pending
-        return super().get_queryset().filter(status=pending_status, 
+        return super().get_queryset().filter(status=pending_status,
             onDateTime=match_time)
 
 class PendingOrActiveRequestManager(models.Manager):
@@ -329,7 +329,7 @@ class IrrigationSchedule(models.Model):
     weekDays.verbose_name = "Week Days"
     weekDays.verbose_name_plural = "Week Days"
     duration = models.IntegerField()
-    duration.verbose_name = "Duration"    
+    duration.verbose_name = "Duration"   
     sortOrder = models.IntegerField(default=0)
 
     class Meta:

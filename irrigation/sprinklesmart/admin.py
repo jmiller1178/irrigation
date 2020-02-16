@@ -49,9 +49,9 @@ admin.site.register(RpiGpio, RpiGpioAdmin)
 
 
 class RpiGpioRequestAdmin(admin.ModelAdmin):
-  list_display = ('rpiGpio',  'onDateTime', 'offDateTime', 'status', 'durationMultiplier',)
-  ordering = ('-id',)
-  list_filter = ('status','onDateTime',)
+    list_display = ('rpiGpio',  'onDateTime', 'offDateTime', 'status', 'durationMultiplier',)
+    ordering = ('onDateTime',)
+    list_filter = ('status','onDateTime',)
   
 admin.site.register(RpiGpioRequest, RpiGpioRequestAdmin)
 
