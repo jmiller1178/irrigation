@@ -216,8 +216,21 @@ class RpiGpio(models.Model):
 
 class TodaysRpiGpioRequestManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(
+        todays_requests = super().get_queryset().filter(
             onDateTime__contains=date.today()).order_by('onDateTime')
+        
+        active_todays_requests = todays_requests.filter(status__statusId=4)
+        pending_todays_requests = todays_requests.filter(status__statusId=1)
+        # complete_todays_requests = todays_requests.filter(status__statusId=2)
+        # cancelled_todays_requests = todays_requests.filter(status__statusId=3)
+
+        # if there are no active or pending requests
+        # there is no point in returning anything to display
+        if active_todays_requests.count() == 0 and\
+           pending_todays_requests.count() == 0:
+            todays_requests = None
+
+        return todays_requests
 
 class OffRequestsManager(models.Manager):
     def get_queryset(self):
@@ -240,7 +253,7 @@ class PendingOrActiveRequestManager(models.Manager):
         pending_status = get_object_or_404(Status, pk=1) # 1 is pending
         active_status = get_object_or_404(Status, pk=4) # 4 is active
 
-        return super().get_queryset().filter(Q(status=pending_status) | Q(status=active_status))
+        return super().get_queryset().filter(Q(status=pending_status) | Q(status=active_status), onDateTime__contains=date.today())
 
 class RpiGpioRequest(models.Model):
     """

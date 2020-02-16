@@ -91,7 +91,17 @@ def post_save_rpi_gpio_request(sender, instance, *args, **kwargs):
                             settings.RABBITMQ_USERNAME,
                             settings.RABBITMQ_PASSWORD)
 
-
     rabbit_mq_api.publish(exchange=EXCHANGE,
+                          routing_key=routing_key,
+                          body=body)
+
+    # see if there are anymore pending requests
+    # if there are none then we publish a message telling the ui to remove
+    # all of the RPi GPIO requests - basically, clear the table
+    pending_or_active_requests = RpiGpioRequest.pending_or_active_requests.all()
+    if pending_or_active_requests.count() == 0:
+        routing_key = "norpigpiorequests"
+        body = "norpigpiorequests"
+        rabbit_mq_api.publish(exchange=EXCHANGE,
                           routing_key=routing_key,
                           body=body)

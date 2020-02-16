@@ -12,15 +12,19 @@ from django.http import  JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
-from . models import (RpiGpioRequest, RpiGpio, Zone, Status,\
-    WeatherCondition, IrrigationSystem, Schedule)
-
+from . models import (RpiGpioRequest, RpiGpio, Zone, Status,
+                      WeatherCondition, IrrigationSystem, Schedule)
 from sprinklesmart.gpio.controller import (turn_zone_on, turn_zone_off, turn_24_vac_off,
- turn_24_vac_on, turn_all_zone_outputs_off, irrigation_system_enabled,
- turn_irrigation_system_active_off, turn_irrigation_system_active_on)
+                                           turn_24_vac_on, turn_all_zone_outputs_off,
+                                           irrigation_system_enabled, turn_irrigation_system_active_off,
+                                           turn_irrigation_system_active_on)
 from . serializers import (IrrigationSystemSerializer, WeatherConditionSerializer, 
-    ZoneSerializer, RpiGpioRequestSerializer)
+                           ZoneSerializer, RpiGpioRequestSerializer)
 from rest_framework.renderers import JSONRenderer
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 # main browser based view for the irrigation website
 # /index.html
@@ -28,7 +32,7 @@ def index(request):
     zones = Zone.objects.filter(enabled=True)
     serializer = ZoneSerializer(zones, many=True)
     zone_list_json = json.dumps(serializer.data)
-    
+       
     # latest WeatherCondtion
     current_weather_condition = WeatherCondition.objects.filter().order_by('-id')[0]
     serializer = WeatherConditionSerializer(current_weather_condition, many=False)
@@ -232,7 +236,7 @@ def toggle_system_mode(request):
 def toggle_zone_request(request):
     json_data = json.loads(request.body.decode('utf-8'))
     zone_id = json_data['zoneId']
-
+    logger.info(zone_id)
     cancelled_status = Status.objects.get(pk=3) # 3 is Cancel
     
     rpi_gpio_on_requests = RpiGpioRequest.pending_or_active_requests.filter(rpiGpio__zone__zoneId=zone_id)

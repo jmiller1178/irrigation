@@ -61,13 +61,13 @@ def turn_zone_on(zoneId):
 
     # read the Zone info from the database
     zone = get_object_or_404(Zone, pk=zoneId)
-    rpiGpio = RpiGpio.objects.get(zone=zone)
+    rpi_gpio = RpiGpio.objects.get(zone=zone)
     # special case - Zone corresponds to IrrigationSystem system_enabled_zone
     if zone == irrigation_system.system_enabled_zone:
         irrigation_system.systemState = True
         irrigation_system.save()
     else:
-        ioid = int(rpiGpio.gpioNumber)
+        ioid = int(rpi_gpio.gpioNumber)
         zone = output_command(ioid, zone, Commands.ON)
     return zone
 
@@ -75,7 +75,7 @@ def turn_zone_off(zoneId):
     irrigation_system = IrrigationSystem.objects.get(pk=1)
     # read the Zone info from the database
     zone = get_object_or_404(Zone, pk=zoneId)
-    rpiGpio = RpiGpio.objects.get(zone=zone)
+    rpi_gpio = RpiGpio.objects.get(zone=zone)
 
     # special case - Zone corresponds to IrrigationSystem valves enabled zone
     if zone == irrigation_system.valves_enabled_zone:
@@ -86,7 +86,7 @@ def turn_zone_off(zoneId):
         irrigation_system.systemState = False
         irrigation_system.save()
     else:
-        ioid = int(rpiGpio.gpioNumber)
+        ioid = int(rpi_gpio.gpioNumber)
         zone = output_command(ioid, zone, Commands.OFF)
     
     return zone

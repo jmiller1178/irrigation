@@ -16,6 +16,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         irrigation_system = IrrigationSystem.objects.get(pk=1)
 
+        if irrigation_system.system_mode.manual_mode:
+            # need to cancel any outstanding RPiGPIO requests
+            requests = RpiGpioRequest.pending_requests.all()
+            cancelled_status = get_object_or_404(Status, pk=3) # 3 is cancelled
+            for request in requests:
+                request.status = cancelled_status
+                request.save()
+            # turn off the indicator that we have valves enabled (aka Blue LED)
+            turn_irrigation_system_active_off()
+
         # are we in automatic mode and the system enabled
         if irrigation_system.system_mode.automatic_mode and\
             irrigation_system.systemState:
@@ -35,9 +45,6 @@ class Command(BaseCommand):
                 # turn on 24VAC
                 turn_24_vac_on()
 
-            current_time = datetime.now()
-            match_time = datetime(current_time.year, current_time.month, current_time.day, current_time.hour, current_time.minute, second=0, microsecond=0)
-                        
             # are there any active requests whith the off time equal to now (to the minute)
             off_requests = RpiGpioRequest.off_requests.all()
 

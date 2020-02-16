@@ -16,11 +16,10 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    // insert the table rows for the Automatic Section
-    var requests_table = $(".requests-table tbody");
+    // 1st clear the table of all requests
+    remove_all_rpi_gpio_requests();
 
-    requests_table.empty();
-
+    // then append all of the requests - this gets us in a starting state
     todays_requests.forEach(function(request) {
         append_request_zone(request);
     });
@@ -149,8 +148,11 @@ jQuery(document).ready(function ($) {
         popup.attr('style','visibility: visible');
 
         var button_confirm_yes = $(".btn-confirm-yes");
+        button_confirm_yes.attr('zone-id', zoneId);
         button_confirm_yes.on('click', function(event){
             popup.attr('style','visibility: hidden');
+            var button = $(this);
+            zoneId = button.attr('zone-id');
             event.stopPropagation();
             event.stopImmediatePropagation();
             $.ajax({
@@ -209,6 +211,14 @@ function append_request_zone(request) {
     // find the button we just appended to the table
     var request_zone_button = $("[data-request-zone-id=" + request.rpiGpio.zone.zoneId + "]");
     return request_zone_button;
+}
+
+function remove_all_rpi_gpio_requests(){
+    // clear the table of all zone requests
+    // insert the table rows for the Automatic Section
+    var requests_table = $(".requests-table tbody");
+
+    requests_table.empty();
 }
 
 function update_request_zone_button(request_zone_data) {

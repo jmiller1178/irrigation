@@ -10,4 +10,5 @@ class Command(BaseCommand):
     help = 'Process RPi GPIO Requests'
     
     def handle(self, *args, **options):
-      turn_all_zone_outputs_off             
+      turn_all_zone_outputs_off
+      
