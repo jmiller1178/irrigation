@@ -124,7 +124,7 @@ def turn_all_outputs_off():
     if there are any zone outputs currently ON, we should find an active RPiGPIORequest record
     with a status of 4 which means "In Progress"
     """
-    active_requests = RpiGpioRequest.objects.filter(status__in=[4], onDateTime__contains=date.today())
+    active_requests = RpiGpioRequest.pending_or_active_requests.all()
     current_time_plus_1_minutes = (datetime.now() + timedelta(seconds=15)).strftime("%H:%M")
     new_off_date_time =  datetime.strptime(str(date.today()) + ' ' + current_time_plus_1_minutes, "%Y-%m-%d %H:%M")
     for rpiGpioRequest in active_requests:
@@ -160,7 +160,7 @@ def rpi_gpio_request_cancel(request, id):
     
 def rpi_gpio_request_cancel_all(request):
     # 1 is pending 4 is active
-    rpiGpioOnRequests = RpiGpioRequest.objects.filter(Q(status=1) | Q(status=4))
+    rpiGpioOnRequests = RpiGpioRequest.pending_or_active_requests.all()
     cancelled_status = get_object_or_404(Status, pk=3)
     # cancel the ON requests
     for rpiGpioOnRequest in rpiGpioOnRequests:

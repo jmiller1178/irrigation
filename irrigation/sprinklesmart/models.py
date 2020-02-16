@@ -113,7 +113,7 @@ class IrrigationSystem(models.Model):
             # going from automatic to manual
             system_mode = SystemMode.objects.get(short_name='M')
             # need to cancel all open requests here
-            rpi_gpio_on_requests = RpiGpioRequest.objects.filter(Q(status=1) | Q(status=4))
+            rpi_gpio_on_requests = RpiGpioRequest.pending_or_active_requests.all()
             cancelled_status = Status.objects.get(pk=3)
             # cancel the ON requests
             for rpi_gpio_on_reqest in rpi_gpio_on_requests:
