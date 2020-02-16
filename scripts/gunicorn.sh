@@ -4,7 +4,7 @@ LOGFILE=/var/www/data/irrigation/log/gunicorn.log
 LOGDIR=$(dirname $LOGFILE)
 PIDFILE=/var/www/data/irrigation/run/gunicorn.pid
 TMPDIR=/var/www/data/irrigation/tmp/
-NUM_WORKERS=5
+NUM_WORKERS=1
 # user/group to run as
 USER=www-data
 GROUP=www-data
