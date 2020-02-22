@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from sprinklesmart.models import RpiGpioRequest, Schedule, WeekDay, Status, WeatherCondition, IrrigationSystem
-from sprinklesmart.gpio.controller import OutputCommand, Commands, turn_all_zone_outputs_off
+from sprinklesmart.gpio.controller import turn_all_zone_outputs_off
 from django.db.models import Q, Min
 import logging
 
