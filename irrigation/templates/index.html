@@ -32,9 +32,9 @@
   <script  src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
     crossorigin="anonymous">
-   </script>
+  </script>
    
-   <script src="{% static 'js/stomp.min.js' %}"></script>
+  <script src="{% static 'js/stomp.min.js' %}"></script>
    {% compress js %}
     <script src="{% static "js/utility.js" %}"></script>
     <script src="{% static "js/irrigation.js" %}"></script>
@@ -46,7 +46,7 @@
     var rabbitmq_username = "{% rabbitmq_username %}";
     var rabbitmq_password = "{% rabbitmq_password %}";
     var rabbitmq_ws_port = "{% rabbitmq_ws_port %}";
-</script>
+  </script>
   <script>var irrigation_system={{ irrigation_system|safe }};</script>
   <script>var zone_list={{ zone_list|safe }};</script>
   <script>var todays_requests={{ todays_requests|safe }};</script>
@@ -55,24 +55,7 @@
   <script>var valves_enabled_zone_data={{ valves_enabled_zone_data|safe }};</script>
 </head>
 <body>
-  <div class="navigation">
-    <input type="checkbox" class="navigation__checkbox" id="navi-toggle">
-
-    <label for="navi-toggle" class="navigation__button">
-        <span class="navigation__icon">&nbsp;</span>
-    </label>
-
-    <div class="navigation__background">&nbsp;</div>
-
-    <nav class="navigation__nav">
-        <ul class="navigation__list">
-            <li class="navigation__item"><a href="/" class="navigation__link">Home</a></li>
-            <li class="navigation__item"><a href="/manually_schedule/" class="navigation__link">Schedule</a></li>
-            <li class="navigation__item"><a href="/admin/" class="navigation__link">Admin</a></li>
-            <li class="navigation__item"><a href="/m" class="navigation__link">Mobile</a></li>
-            </ul>
-    </nav>
-  </div>
+  {% include "_navigation.html" %}
 
   <header class="header">
       <div class="header__text-box">

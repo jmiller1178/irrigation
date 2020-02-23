@@ -1,64 +1,55 @@
-﻿{% load static %}
+﻿{% load static compress sekizai_tags sass_tags settings_tags %}
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Irrigation Control System</title>
-  <link href="{% static 'style.css' %}" rel="stylesheet" type="text/css" />
- </head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title> Sprinkle Smart</title>
+  {% compress css %}
+
+  <link type="text/x-scss" href="{% sass_src "sass/main.scss" %}" rel="stylesheet" />
+  
+  {% endcompress %}
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/icon-font.css' %}">
+  <link rel="apple-touch-icon" sizes="57x57" href="{% static 'img/apple-icon-57x57.png' %}">
+  <link rel="apple-touch-icon" sizes="60x60" href="{% static 'img/apple-icon-60x60.png' %}">
+  <link rel="apple-touch-icon" sizes="72x72" href="{% static 'img/apple-icon-72x72.png' %}">
+  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon-76x76.png' %}">
+  <link rel="apple-touch-icon" sizes="114x114" href="{% static 'img/apple-icon-114x114.png' %}">
+  <link rel="apple-touch-icon" sizes="120x120" href="{% static 'img/apple-icon-120x120.png' %}">
+  <link rel="apple-touch-icon" sizes="144x144" href="{% static 'img/apple-icon-144x144.png' %}">
+  <link rel="apple-touch-icon" sizes="152x152" href="{% static 'img/apple-icon-152x152.png' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-icon-180x180.png' %}">
+  <link rel="icon" type="image/png" sizes="192x192"  href="{% static 'img/android-icon-192x192.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="96x96" href="{% static 'img/favicon-96x96.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'img/manifest.json' %}">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="{% static 'img/ms-icon-144x144.png' %}">
+  <meta name="theme-color" content="#ffffff">
+
+  <script  src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous">
+  </script>
+  <script>var schedules={{ schedules|safe }};</script> 
+  <script src="{% static 'js/stomp.min.js' %}"></script>
+  {% compress js %}
+    <script src="{% static "js/utility.js" %}"></script>
+    <script src="{% static "js/schedule.js" %}"></script>
+  {% endcompress %}
+  {% render_block "js" %}
+  
+</head>
 
 <body>
-     
-    <div id="header">
-        <div id="search" ><form action="" method="get"></form></div>
-        <div id="navigation">
-            <ul>
-                  <li><a href="/">Home</a></li>
-                  <li><a href="/manually_schedule/">Schedule</a></li>
-                  <li><a href="/admin/">Admin</a></li>
-                  <li><a href="/m">Mobile</a></li>
-            </ul>
-        </div>
-    </div>
+  {% include "_navigation.html" %}
 
-    <div id="content" align="center">
-        <form action="/create_schedule/" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="{{ form.schedule.id_for_label }}" class="col-sm-2 control-label">Schedule</label>
-              <div class="col-sm-10">    
-                <select id="{{ form.schedule.id_for_label }}" name="{{ form.schedule.html_name }}" class="form-control">
-                  <option value="" selected>Please select a schedule</option>
-                  {% for schedule in schedule_list %}
-                  <option value="{{ schedule.scheduleId }}">{{ schedule.displayName }}</option>
-                  {% endfor %}
-                </select>    
-              </div>
-            </div>
-			{% if todays_requests %}
-			  {% if todays_requests|length > 0 %}
-				<div id=schedule_warning>Attention:  There are {{ todays_requests|length }} scheduled items which will be <b>Cancelled</b> if you manually schedule</div>
-			  {% endif %}
-			{% endif %}
-            <table id="schedule_table" width="790" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <th>Zone</th>
-                <th>Enable</th>
-                <th>Minutes</th>
-              </tr>
-            {% if zone_list %}
-              {% for zone in zone_list %}
-              <tr>
-                <td>{{ zone.displayName }}</td>
-                <td><input type="checkbox" name="chkZone_{{ zone.zoneId }}" checked /></td>
-                <td><input name="duration_{{ zone.zoneId }}" value="15" type="text" id="zone_duration_{{ zone.zoneId }}" size="8" style="text-align: right"/>
-              </tr>  
-              {% endfor %}
-            {% endif %}
-              <tr>
-                <td colspan="3">Start Time:&nbsp;<input name="start_time" value={{ current_time_plus_5_minutes }} type="time" id="start_time" size="8" /></td>
-              </tr>  
-              <tr><td><input type="submit" value="Schedule"></td></tr>
-            </table>
-        </form>
-    </div>
+  <div class="form-select">
+    <select name="" id="" class="schedule-dropdown">
+      <option value="" disabled="disabled" selected="selected">Select Schedule</option>
+    </select>
+  </div>
+
 </body>
 

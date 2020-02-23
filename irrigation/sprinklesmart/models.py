@@ -172,7 +172,7 @@ class Schedule(models.Model):
     scheduleId = models.IntegerField(primary_key="True")
     scheduleId.verbose_name = "Schedule Id"
     shortName = models.CharField(max_length=45)
-    shortName.verbose_name= "Short Name"
+    shortName.verbose_name = "Short Name"
     displayName = models.CharField(max_length=255)
     displayName.verbose_name = "Display Name"
     enabled = models.BooleanField(default=True)

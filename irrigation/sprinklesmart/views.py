@@ -19,7 +19,7 @@ from sprinklesmart.gpio.controller import (turn_zone_on, turn_zone_off, turn_24_
                                            irrigation_system_enabled, turn_irrigation_system_active_off,
                                            turn_irrigation_system_active_on)
 from . serializers import (IrrigationSystemSerializer, WeatherConditionSerializer, 
-                           ZoneSerializer, RpiGpioRequestSerializer)
+                           ZoneSerializer, RpiGpioRequestSerializer, ScheduleSerializer)
 from rest_framework.renderers import JSONRenderer
 
 import logging
@@ -72,20 +72,14 @@ def index(request):
 # /manually_schedule.html
 @ensure_csrf_cookie
 def manually_schedule(request):
-    zone_list = Zone.objects.filter(visible=True, enabled=True)
-    todays_requests = RpiGpioRequest.todays_requests.all()
-    current_time_plus_5_minutes = (datetime.now() + timedelta(minutes=5)).strftime("%H:%M")
-    schedule_list = Schedule.objects.filter(enabled=True)    
-    
-    return render(request, 
-        'manually_schedule.html',
-            {
-            'schedule_list': schedule_list, 
-            'zone_list' : zone_list,
-            'current_time_plus_5_minutes' : current_time_plus_5_minutes,
-            'todays_requests' : todays_requests,
-            })                               
+    schedules = Schedule.objects.all()
+    serializer = ScheduleSerializer(schedules, many=True)    
+    schedules_json = json.dumps(serializer.data)
 
+    return render(request, 'manually_schedule.html',
+                        {
+                            'schedules': schedules_json,
+                        })
 
 # this is the command that is invoked when the user is on the manual schedule page and they click
 # the "Schedule" button at the bottom of the page
