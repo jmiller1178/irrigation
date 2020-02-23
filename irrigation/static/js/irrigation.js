@@ -253,7 +253,7 @@ function update_request_zone_button(request_zone_data) {
     request_zone_button.text(request_zone_data.status.shortName);
 
     // now update the remaining minutes
-    var remaining_minutes = $(request_zone_button).closest('tr').children('td.remaining-minutes');
+    var remaining_minutes = request_zone_button.closest("tr").find(".remaining-minutes");
     remaining_minutes.text(request_zone_data.remaining);
 }
 
