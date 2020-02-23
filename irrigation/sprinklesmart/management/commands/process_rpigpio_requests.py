@@ -72,4 +72,9 @@ class Command(BaseCommand):
             if pending_or_active_requests.count() == 0:
                 # turn off the indicator that we have valves enabled (aka Blue LED)
                 turn_irrigation_system_active_off()
+
+            # active requests need to be saved so they trigger UI update
+            active_requests = RpiGpioRequest.active_requests.all()
+            for active_request in active_requests:
+                active_request.save()
              

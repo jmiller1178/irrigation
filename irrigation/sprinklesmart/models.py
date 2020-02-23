@@ -248,12 +248,18 @@ class PendingRequestsManager(models.Manager):
         return super().get_queryset().filter(status=pending_status,
             onDateTime=match_time)
 
-class PendingOrActiveRequestManager(models.Manager):
+class PendingOrActiveRequestsManager(models.Manager):
     def get_queryset(self):
         pending_status = get_object_or_404(Status, pk=1) # 1 is pending
         active_status = get_object_or_404(Status, pk=4) # 4 is active
 
         return super().get_queryset().filter(Q(status=pending_status) | Q(status=active_status), onDateTime__contains=date.today())
+
+class ActiveRequestsManager(models.Manager):
+    def get_queryset(self):
+        active_status = get_object_or_404(Status, pk=4) # 4 is active
+        return super().get_queryset().filter(status=active_status,
+            onDateTime__contains=date.today())
 
 class RpiGpioRequest(models.Model):
     """
@@ -273,7 +279,8 @@ class RpiGpioRequest(models.Model):
     todays_requests = TodaysRpiGpioRequestManager()
     off_requests = OffRequestsManager()
     pending_requests = PendingRequestsManager()
-    pending_or_active_requests = PendingOrActiveRequestManager()
+    active_requests = ActiveRequestsManager()
+    pending_or_active_requests = PendingOrActiveRequestsManager()
 
     class Meta:
         db_table = "rpiGpioRequest"
