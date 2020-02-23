@@ -1,0 +1,22 @@
+.form-timepicker  {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.form-timepicker input {
+    background-color: $color-primary-light2;
+    color: $color-grey-dark;
+    padding: 12px;
+    width: 300px;
+    border: none;
+    font-size: 20px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+    appearance: button;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+}

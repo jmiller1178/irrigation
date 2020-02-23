@@ -1,9 +1,15 @@
 
 .form-select  {
     position: absolute;
-    top: 15%;
+    //top: 15%;
     left: 50%;
     transform: translate(-50%, -50%);
+    &.start-time {
+        top: 15%;
+    }
+    &.schedule {
+        top: 25%;
+    }
 }
   
 .form-select select {

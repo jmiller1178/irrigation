@@ -165,7 +165,7 @@ def rpi_gpio_request_cancel_all(request):
 
 
 @require_http_methods(["GET"])
-def get_schedule(request, scheduleId):
+def get_schedule(request, scheduleId, startTime):
     scheduleId = int(scheduleId)
     #schedule = get_object_or_404(Schedule,  pk=scheduleId)
     schedule = Schedule.objects.get(pk=scheduleId)

@@ -824,9 +824,12 @@ body {
 
 .form-select {
   position: absolute;
-  top: 15%;
   left: 50%;
   transform: translate(-50%, -50%); }
+  .form-select.start-time {
+    top: 15%; }
+  .form-select.schedule {
+    top: 25%; }
 
 .form-select select {
   background-color: #abf79e;
@@ -867,6 +870,27 @@ body {
 
 .form-select select option {
   padding: 30px; }
+
+.form-timepicker {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%); }
+
+.form-timepicker input {
+  background-color: #abf79e;
+  color: #777;
+  padding: 12px;
+  width: 300px;
+  border: none;
+  font-size: 20px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  appearance: button;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: ''; }
 
 .footer {
   background-color: #333;

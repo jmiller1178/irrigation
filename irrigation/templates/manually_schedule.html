@@ -32,6 +32,8 @@
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
     crossorigin="anonymous">
   </script>
+  <link rel="stylesheet" href="{% static 'css/jquery.timepicker.min.css' %}">
+  <script src="{% static 'js/jquery.timepicker.min.js' %}"></script>
   <script>var schedules={{ schedules|safe }};</script> 
   <script src="{% static 'js/stomp.min.js' %}"></script>
   {% compress js %}
@@ -44,8 +46,10 @@
 
 <body>
   {% include "_navigation.html" %}
-
-  <div class="form-select">
+  <div class="form-select start-time">
+    <input class="timepicker text-center" data-time-format="h:i A">
+  </div>
+  <div class="form-select schedule">
     <select name="" id="" class="schedule-dropdown">
       <option value="" disabled="disabled" selected="selected">Select Schedule</option>
     </select>
