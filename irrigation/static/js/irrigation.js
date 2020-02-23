@@ -254,7 +254,7 @@ function update_request_zone_button(request_zone_data) {
 
     // now update the remaining minutes
     var remaining_minutes = request_zone_button.closest("tr").find(".remaining-minutes");
-    remaining_minutes.text(request_zone_data.remaining);
+    remaining_minutes.text(Math.round(request_zone_data.remaining));
 }
 
 // used to update the styles and text on the system mode button
