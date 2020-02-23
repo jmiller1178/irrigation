@@ -66,7 +66,10 @@ class Command(BaseCommand):
                     output_rpi_gpio_command(pending_on_request.rpiGpio, Commands.ON)
                     pending_on_request.status = active_status
                     pending_on_request.save()
-            else:
+            
+            # are there any pending or active requests with the on time equal to now (to the minute)
+            pending_or_active_requests = RpiGpioRequest.pending_or_active_requests.all()
+            if pending_or_active_requests.count() == 0:
                 # turn off the indicator that we have valves enabled (aka Blue LED)
                 turn_irrigation_system_active_off()
              
