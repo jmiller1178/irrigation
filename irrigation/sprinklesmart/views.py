@@ -19,7 +19,8 @@ from sprinklesmart.gpio.controller import (turn_zone_on, turn_zone_off, turn_24_
                                            irrigation_system_enabled, turn_irrigation_system_active_off,
                                            turn_irrigation_system_active_on)
 from . serializers import (IrrigationSystemSerializer, WeatherConditionSerializer, 
-                           ZoneSerializer, RpiGpioRequestSerializer, ScheduleSerializer)
+                           ZoneSerializer, RpiGpioRequestSerializer, ScheduleSerializer,
+                           IrrigationScheduleSerializer)
 from rest_framework.renderers import JSONRenderer
 
 import logging
@@ -166,11 +167,14 @@ def rpi_gpio_request_cancel_all(request):
 @require_http_methods(["GET"])
 def get_schedule(request, scheduleId):
     scheduleId = int(scheduleId)
-    schedule = get_object_or_404(Schedule,  pk=scheduleId)
+    #schedule = get_object_or_404(Schedule,  pk=scheduleId)
+    schedule = Schedule.objects.get(pk=scheduleId)
+
     queryset = schedule.irrigationschedule_set.all()
     serializer = IrrigationScheduleSerializer(queryset, many=True)
-
-    return JsonResponse(serializer.data, safe=False)
+    # zone_list_json = json.dumps(serializer.data)
+    json_data = json.dumps(serializer.data)
+    return JsonResponse(json_data, safe=False)
 
 @require_POST
 def toggle_zone(request):
