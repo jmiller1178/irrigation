@@ -5,16 +5,19 @@ from sprinklesmart.api.weather import WeatherAPI
 from sprinklesmart import models
 from django.shortcuts import get_object_or_404
 
-
-
 class Command(BaseCommand):
+    """
+        Make a call to the yahoo weather API and record the 
+        current weather conditions in the database
+    """
+
     help = 'Record Current Weather Conditions'
 
     def internet_is_available(self):
         available = False
         try:
-            response=urllib.request.urlopen(settings.INTERNET_CHECK_URL,timeout=1)
-            available= True
+            response = urllib.request.urlopen(settings.INTERNET_CHECK_URL, timeout=1)
+            available = True
         except urllib.error.URLError as err: 
             pass
             
@@ -42,8 +45,8 @@ class Command(BaseCommand):
             
             weather_condition = models.WeatherCondition()
             
-            weather_condition.title=title
-            weather_condition.conditionDateTime=condition_date_time
+            weather_condition.title = title
+            weather_condition.conditionDateTime = condition_date_time
             weather_condition.temperature = temperature
             # unitOfMeasure = uom
             weather_condition.conditionCode = condition_code

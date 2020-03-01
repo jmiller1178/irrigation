@@ -23,6 +23,7 @@ jQuery(document).ready(function ($) {
     schedules.forEach(function(schedule) {
         dropdown.append($('<option></option>').attr('value', schedule.scheduleId).text(schedule.displayName));
     });
+   
 
     $(".schedule-dropdown").change(function(){
         var schedule = $(this);
@@ -47,7 +48,17 @@ function get_schedule(scheduleId, startTime) {
             type: "GET",
             url: url,
         }).done(function (response) {
-            console.debug(response);
+            remove_all_rpi_gpio_requests();
+            requests = JSON.parse(response);
+            console.debug(requests);
+            // we have data which is an array
+            // of JSON RPi GPIO requests
+            // need to output them in the form of a table
+             // then append all of the requests - this gets us in a starting state
+             requests.forEach(function(request) {
+                append_manual_request_zone(request);
+            });
+            $(".duration-input").focus(function() { $(this).select(); } );
         }).always(function () {
         
         });

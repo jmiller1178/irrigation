@@ -7,25 +7,31 @@ jQuery(document).ready(function ($) {
     
     // insert the table rows for the Manual Section
     var zone_table = $(".zone-table tbody");
-    zone_list.forEach(function(zone) { 
-        if (zone.visible){
-            var new_zone_row = "<tr><td><span>" + zone.shortName + "</span></td>";
-            new_zone_row += "<td><span>" + zone.locationName + "</span></td>";
-            new_zone_row += "<td><span class=\"btn btn-toggle-zone\" data-zone-id=" + zone.zoneId + "></span></td></tr>";
-            zone_table.append(new_zone_row);
-        }
-    });
+    if (typeof zone_list != 'undefined') {
+        zone_list.forEach(function(zone) { 
+            if (zone.visible){
+                var new_zone_row = "<tr><td><span>" + zone.shortName + "</span></td>";
+                new_zone_row += "<td><span>" + zone.locationName + "</span></td>";
+                new_zone_row += "<td><span class=\"btn btn-toggle-zone\" data-zone-id=" + zone.zoneId + "></span></td></tr>";
+                zone_table.append(new_zone_row);
+            }
+        });
+    }
 
     // 1st clear the table of all requests
     remove_all_rpi_gpio_requests();
 
     // then append all of the requests - this gets us in a starting state
-    todays_requests.forEach(function(request) {
-        append_request_zone(request);
-    });
+    if (typeof todays_requests != 'undefined') {
+        todays_requests.forEach(function(request) {
+            append_request_zone(request);
+        });
+    }
 
     // update the system mode (Manual / Automatic) to reflect current state
-    update_system_mode_button(irrigation_system);
+    if (typeof irrigation_system != 'undefined') {
+        update_system_mode_button(irrigation_system);
+    }
 
     // update the Manual Section zone toggle buttons
     $("[data-zone-id]").each(function(zone_button){
@@ -46,8 +52,9 @@ jQuery(document).ready(function ($) {
     });
 
     // update the current weather conditions
-    update_current_weather_conditions(current_weather_conditions);
-
+    if (typeof current_weather_conditions != 'undefined') {
+        update_current_weather_conditions(current_weather_conditions);
+    }
 
     // Click handler for the system mode (Manual / Automatic) button
     $(".btn-toggle-system-mode").on('click', function(){
@@ -211,6 +218,24 @@ function append_request_zone(request) {
     // find the button we just appended to the table
     var request_zone_button = $("[data-request-zone-id=" + request.rpiGpio.zone.zoneId + "]");
     return request_zone_button;
+}
+
+function append_manual_request_zone(request) {
+    // insert a table row for the Automatic Section
+    var requests_table = $(".requests-table tbody");
+
+    var new_request_row = "<tr>";
+    new_request_row += "<td><span>" + request.rpiGpio.zone.shortName + "</span></td>";
+    new_request_row += "<td><span>" + request.rpiGpio.zone.locationName + "</span></td>;"
+    new_request_row += "<td><span>" + request.on_time + "</span></td>";
+    new_request_row += "<td><span>" + request.off_time + "</span></td>";
+    new_request_row += "<td><input class='duration-input' name='duration_" + request.rpiGpio.zone.zoneId + "'";
+    new_request_row += "value=" + request.duration + " type='number' id='zone_duration_" + request.rpiGpio.zone.zoneId + "'/></td>"
+    new_request_row += "<td><label><input class='request-enabled css-checkbox' value='request_enabled_" + request.rpiGpio.zone.zoneId + "' ";
+    new_request_row += "name='request_enabled_" + request.rpiGpio.zone.zoneId + "'";
+    new_request_row += "type='checkbox' checked /><i></i></label></td>"
+    new_request_row += "</tr>"
+    requests_table.append(new_request_row);
 }
 
 function remove_all_rpi_gpio_requests(){

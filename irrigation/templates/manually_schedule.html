@@ -38,6 +38,7 @@
   <script src="{% static 'js/stomp.min.js' %}"></script>
   {% compress js %}
     <script src="{% static "js/utility.js" %}"></script>
+    <script src="{% static "js/irrigation.js" %}"></script>
     <script src="{% static "js/schedule.js" %}"></script>
   {% endcompress %}
   {% render_block "js" %}
@@ -46,14 +47,37 @@
 
 <body>
   {% include "_navigation.html" %}
-  <div class="form-select start-time">
-    <input class="timepicker text-center" data-time-format="h:i A">
-  </div>
-  <div class="form-select schedule">
-    <select name="" id="" class="schedule-dropdown">
-      <option value="" disabled="disabled" selected="selected">Select Schedule</option>
-    </select>
-  </div>
-
+ 
+  <form  action="path/to/server/script" method="post" id="manual_schedule_form">
+    {% csrf_token %}
+    <div class="form-select start-time">
+      <input class="timepicker text-center" data-time-format="h:i A">
+    </div>
+    <div class="form-select schedule">
+      <select name="" id="" class="schedule-dropdown">
+        <option value="" disabled="disabled" selected="selected">Select Schedule</option>
+      </select>
+    </div>
+    <!-- start of manually scheduled requests content-->
+    <div class="form-select scheduled-requests-table">
+      <table class="table table-condensed table-bordered requests-table">
+        <thead>
+            <tr>
+                <th>Zone</th>
+                <th>Location</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration</th>
+                <th>Enabled</th>
+            </tr>
+        </thead>
+        <tbody>
+          <!-- table rows are dynamically inserted via JS-->  
+        </tbody>
+      </table>
+    </div>
+    <input type="submit" value="OK">
+  </form>
+  <!-- end of auto mode content-->
 </body>
 

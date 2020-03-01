@@ -22,6 +22,7 @@ from . serializers import (IrrigationSystemSerializer, WeatherConditionSerialize
                            ZoneSerializer, RpiGpioRequestSerializer, ScheduleSerializer,
                            IrrigationScheduleSerializer)
 from rest_framework.renderers import JSONRenderer
+from sprinklesmart.api.weather import WeatherAPI
 
 import logging
 
@@ -155,23 +156,81 @@ def rpi_gpio_request_cancel(request, id):
     
 def rpi_gpio_request_cancel_all(request):
     # 1 is pending 4 is active
-    rpiGpioOnRequests = RpiGpioRequest.pending_or_active_requests.all()
+    rpi_gpio_on_requests = RpiGpioRequest.pending_or_active_requests.all()
     cancelled_status = get_object_or_404(Status, pk=3)
     # cancel the ON requests
-    for rpiGpioOnRequest in rpiGpioOnRequests:
-        rpiGpioOnRequest.status = cancelled_status
-        rpiGpioOnRequest.save()
+    for rpi_gpio_on_request in rpi_gpio_on_requests:
+        rpi_gpio_on_request.status = cancelled_status
+        rpi_gpio_on_request.save()
     return HttpResponseRedirect('/')
 
 
 @require_http_methods(["GET"])
 def get_schedule(request, scheduleId, startTime):
+    """
+        from the UI, the scheduleId and desired start time are chosen
+        and passed in the URL
+        this function will return the RPi GPIO requests
+    """
+
     scheduleId = int(scheduleId)
-    #schedule = get_object_or_404(Schedule,  pk=scheduleId)
+    # get the Schedule
     schedule = Schedule.objects.get(pk=scheduleId)
 
-    queryset = schedule.irrigationschedule_set.all()
-    serializer = IrrigationScheduleSerializer(queryset, many=True)
+    # get the 1st IrrigationSchedule associated to this schedule
+    # normally we use the day of the week to filter but we don't 
+    # need to do that in this case since we want the zones, times and
+    # durations only
+    irrigation_schedule = schedule.irrigationschedule_set.first()
+    week_day = irrigation_schedule.weekDays.first()
+    irrigation_schedules = schedule.irrigationschedule_set.filter(weekDays=week_day).order_by('sortOrder')
+
+    # this establishes the current date
+    current_time = datetime.now()
+
+    # need to set current time hour and minute from passed in
+    # startTime
+    startTime = datetime.strptime(startTime, '%H:%M %p')
+
+    # initialize the zone start time - when the whole schedule kicks off
+    # give the passed in start time
+    zone_start_time = datetime(current_time.year, current_time.month,
+                               current_time.day, startTime.hour,
+                               startTime.minute)
+    # used below
+    pending_status = get_object_or_404(Status, pk=1)
+
+    # get the multiplier
+    weather_api = WeatherAPI()
+    sprinkle_smart_multiplier = weather_api.get_sprinkle_smart_multiplier()
+    scheduled_requests = []
+
+    # create RpiGpioRequest records for the start time
+    # there should only be one rpiGpio per zone but it is a set so iterate anyway
+    for irrigation_schedule in irrigation_schedules:
+        rpigpios = irrigation_schedule.zone.rpigpio_set.all()
+
+        for rpigpio in rpigpios:            
+            # instantiate a RpiGpioRequest
+            scheduled_request = RpiGpioRequest()
+            scheduled_request.rpiGpio = rpigpio
+            # set it's start time
+            scheduled_request.onDateTime = zone_start_time
+            
+            # estabilsh the end time
+            duration_seconds = irrigation_schedule.duration * sprinkle_smart_multiplier * 60
+            zone_end_time = zone_start_time + timedelta(0, duration_seconds)
+            
+            scheduled_request.offDateTime = zone_end_time
+            # set the status to pending so it gets picked up
+            scheduled_request.status = pending_status
+            scheduled_request.durationMultiplier = sprinkle_smart_multiplier
+            #scheduled_request.save()
+            # need to append it to an array - not save it
+            zone_start_time = zone_end_time
+            scheduled_requests.append(scheduled_request)
+
+    serializer = RpiGpioRequestSerializer(scheduled_requests, many=True)
     # zone_list_json = json.dumps(serializer.data)
     json_data = json.dumps(serializer.data)
     return JsonResponse(json_data, safe=False)

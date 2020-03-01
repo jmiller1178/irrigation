@@ -1,16 +1,22 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from sprinklesmart.api.weather import WeatherAPI
 from django.shortcuts import get_object_or_404
-from datetime import datetime, date, timedelta
-from sprinklesmart.models import IrrigationSystem, RpiGpioRequest, Schedule,\
-                                WeekDay, Status, WeatherCondition
 from django.db.models import Q
+from datetime import datetime, date, timedelta
+from sprinklesmart.models import (IrrigationSystem, RpiGpioRequest, Schedule,
+                                WeekDay, Status, WeatherCondition)
+from sprinklesmart.api.weather import WeatherAPI
+
 import logging
 
 logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
+    """
+        look for any upcoming irrigation schedules and
+        create the rpigpio requests in the database
+    """
+
     help = 'Schedule Irrigation Controller Events'
     
     def handle(self, *args, **options):
@@ -28,11 +34,12 @@ class Command(BaseCommand):
             requests = RpiGpioRequest.pending_requests.all()
         
             if requests.count() == 0:
+                weather_api = WeatherAPI()
                 # there is nothing scheduled for today so do the scheduling process
             
                 # look for active schedule(s) with a start time within the next hour
                 enabled_schedules = Schedule.objects.filter(enabled=True)
-                sprinkle_smart_multiplier = self.get_sprinkle_smart_multiplier()
+                sprinkle_smart_multiplier = weather_api.get_sprinkle_smart_multiplier()
             
                 # retrieve IrrigationSchedule records for this day of the week and for the above Schedule
                 current_time = datetime.now()
@@ -62,7 +69,7 @@ class Command(BaseCommand):
                                     scheduled_request.rpiGpio = rpigpio
                                     scheduled_request.onDateTime = zone_start_time
                                     
-                                    duration_seconds = irrigation_schedule.duration * 60
+                                    duration_seconds = irrigation_schedule.duration * sprinkle_smart_multiplier * 60
                                     zone_end_time = zone_start_time + timedelta(0, duration_seconds)
                                     
                                     scheduled_request.offDateTime = zone_end_time
@@ -72,18 +79,3 @@ class Command(BaseCommand):
                                     zone_start_time = zone_end_time
     
     
-    def get_sprinkle_smart_multiplier(self):
-        multiplier = 1.0
-        
-        weather_conditions = WeatherCondition.objects.filter(conditionDateTime__gt=datetime.now()-timedelta(days=2))
-        total_count = weather_conditions.count()
-        rain_count = 0
-        
-        for weather_condition in weather_conditions:
-            if weather_condition.conditionCode.IsRaining:
-                rain_count = rain_count + 1
-        
-        if total_count > 0:
-            multiplier = 1.0 - rain_count / total_count
-
-        return multiplier
