@@ -1,0 +1,80 @@
+
+// css checkbox mixin
+@mixin css-checkbox(
+        $size: '16px',
+        $selectedColor: #444,
+        $checkColor: #FFF,
+        $valign: 'middle',
+        $rounded: rounded
+    ) {
+	display: none;
+
+	&:checked + i {
+		background: #{$selectedColor};
+		border-color: #{$selectedColor};
+
+		&:hover:after { opacity: 1; }
+
+		&:after {
+			opacity: 1;
+      border-color: #{$checkColor};
+		}
+	}
+
+  + i {
+    box-sizing: border-box;
+    &:before, &:after {
+       box-sizing: border-box;
+    }
+  }
+	+ i {
+		position: relative;
+		display: inline-block;
+		top: -1px;
+		width: #{$size};
+		height: #{$size};
+		margin: 0;
+    vertical-align: #{$valign};
+		border: 1px solid #999;
+    transition: background 200ms ease;
+
+    @if $rounded == "circle" {
+      border-radius: 10em; 
+    } @else if $rounded == "rounded" {
+      border-radius: .2em; 
+    } @else {
+      border-radius: 0; 
+    }    
+     
+		background: #F9F9F9;
+		font-size: #{$size};
+		cursor: pointer;
+
+		&:hover:after { opacity: .2; }
+
+		&:after {
+			content: '';
+			opacity: 0;
+			transform: translateZ(1px) rotate(-45deg);
+      outline: 1px solid transparent; // hack to prevent antialias atrifacts in firefox
+			position: absolute;
+			top: 22%;
+			left: 15%;
+			width: .68em;
+			height: .4em;
+			border: .15em solid #222;
+			border-top: none;
+			border-right: none;
+			background: rgba(0, 0, 0, 0);
+		}
+	}
+}
+
+
+// css checkbox
+label {
+  .css-checkbox {
+    @include css-checkbox(2rem, $selectedColor: $color-green);
+  }
+}
+

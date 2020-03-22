@@ -68,7 +68,8 @@ class IrrigationScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IrrigationSchedule
-        fields = ['zone', 'weekDays', 'duration', 'sortOrder',  ]
+        fields = ['zone', 'weekDays', 'duration', 'sortOrder',
+                  'schedule', ]
 
 class RpiGpioRequestSerializer(serializers.ModelSerializer):
     rpiGpio = RpiGpioSerializer(required=True)

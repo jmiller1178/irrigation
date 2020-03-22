@@ -172,7 +172,7 @@ class Schedule(models.Model):
     scheduleId = models.IntegerField(primary_key="True")
     scheduleId.verbose_name = "Schedule Id"
     shortName = models.CharField(max_length=45)
-    shortName.verbose_name= "Short Name"
+    shortName.verbose_name = "Short Name"
     displayName = models.CharField(max_length=255)
     displayName.verbose_name = "Display Name"
     enabled = models.BooleanField(default=True)
@@ -217,18 +217,19 @@ class RpiGpio(models.Model):
 class TodaysRpiGpioRequestManager(models.Manager):
     def get_queryset(self):
         todays_requests = super().get_queryset().filter(
-            onDateTime__contains=date.today()).order_by('onDateTime')
+            onDateTime__contains=date.today(),
+            status__statusId__in=(1,4)).order_by('onDateTime')
         
-        active_todays_requests = todays_requests.filter(status__statusId=4)
-        pending_todays_requests = todays_requests.filter(status__statusId=1)
+        # active_todays_requests = todays_requests.filter(status__statusId=4)
+        # pending_todays_requests = todays_requests.filter(status__statusId=1)
         # complete_todays_requests = todays_requests.filter(status__statusId=2)
         # cancelled_todays_requests = todays_requests.filter(status__statusId=3)
 
         # if there are no active or pending requests
         # there is no point in returning anything to display
-        if active_todays_requests.count() == 0 and\
-           pending_todays_requests.count() == 0:
-            todays_requests = None
+        #if active_todays_requests.count() == 0 and\
+        #   pending_todays_requests.count() == 0:
+        #    todays_requests = None
 
         return todays_requests
 
@@ -336,20 +337,24 @@ class RpiGpioRequest(models.Model):
           remaining =(self.offDateTime - self.onDateTime).seconds / 60
         return remaining
 
+    @property
+    def zone(self):
+        return self.rpiGpio.zone
+
     def __str__(self):
         return self.rpiGpio.displayName + ' ' + self.status.displayName + ' ON: ' + str(self.onDateTime) + ' OFF: ' + str(self.offDateTime)
   
 class IrrigationSchedule(models.Model):
     """
-    IrrigationSchedule is part of the setup to build the schedule 
+        IrrigationSchedule is part of the setup to build the schedule
     """
-    schedule = models.ForeignKey(Schedule,  db_column="scheduleId", on_delete=models.PROTECT)
-    zone = models.ForeignKey(Zone,  db_column="zoneId", on_delete=models.PROTECT)
+    schedule = models.ForeignKey(Schedule, db_column="scheduleId", on_delete=models.PROTECT)
+    zone = models.ForeignKey(Zone, db_column="zoneId", on_delete=models.PROTECT)
     weekDays = models.ManyToManyField(WeekDay)
     weekDays.verbose_name = "Week Days"
     weekDays.verbose_name_plural = "Week Days"
     duration = models.IntegerField()
-    duration.verbose_name = "Duration"   
+    duration.verbose_name = "Duration"
     sortOrder = models.IntegerField(default=0)
 
     class Meta:

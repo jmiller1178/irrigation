@@ -19,16 +19,23 @@ from sprinklesmart.gpio.controller import (turn_zone_on, turn_zone_off, turn_24_
                                            irrigation_system_enabled, turn_irrigation_system_active_off,
                                            turn_irrigation_system_active_on)
 from . serializers import (IrrigationSystemSerializer, WeatherConditionSerializer, 
-                           ZoneSerializer, RpiGpioRequestSerializer)
+                           ZoneSerializer, RpiGpioRequestSerializer, ScheduleSerializer,
+                           IrrigationScheduleSerializer)
 from rest_framework.renderers import JSONRenderer
+from sprinklesmart.api.weather import WeatherAPI
 
 import logging
 
 logger = logging.getLogger(__name__)
 
-# main browser based view for the irrigation website
-# /index.html
+
+@require_http_methods(["GET"])
 def index(request):
+    """
+        main browser based view for the irrigation website
+        index.html
+    """
+    template = 'index.html'
     zones = Zone.objects.filter(enabled=True)
     serializer = ZoneSerializer(zones, many=True)
     zone_list_json = json.dumps(serializer.data)
@@ -57,7 +64,7 @@ def index(request):
     serializer = IrrigationSystemSerializer(irrigation_system, many=False)
     irrigation_system = json.dumps(serializer.data)
 
-    return render(request, 'index.html',
+    return render(request, template,
                         {
                             'irrigation_system': irrigation_system_json,
                             'system_enabled_zone_data' : system_enabled_zone_json,
@@ -67,56 +74,55 @@ def index(request):
                             'current_weather_conditions' : current_weather_conditions_json,
                         })
 
-
-# web browser view invoked when the page for manually scheduling zone activities is loaded
-# /manually_schedule.html
-@ensure_csrf_cookie
+@require_http_methods(["GET"])
 def manually_schedule(request):
-    zone_list = Zone.objects.filter(visible=True, enabled=True)
-    todays_requests = RpiGpioRequest.todays_requests.all()
-    current_time_plus_5_minutes = (datetime.now() + timedelta(minutes=5)).strftime("%H:%M")
-    schedule_list = Schedule.objects.filter(enabled=True)    
-    
-    return render(request, 
-        'manually_schedule.html',
-            {
-            'schedule_list': schedule_list, 
-            'zone_list' : zone_list,
-            'current_time_plus_5_minutes' : current_time_plus_5_minutes,
-            'todays_requests' : todays_requests,
-            })                               
+    """
+        web browser view invoked when the page for manually scheduling zone activities is loaded
+        manually_schedule.html
+    """
+    template = 'manually_schedule.html'
+    schedules = Schedule.objects.all()
+    serializer = ScheduleSerializer(schedules, many=True)    
+    schedules_json = json.dumps(serializer.data)
 
+    return render(request, template,
+                    {
+                        'schedules': schedules_json,
+                    })
 
-# this is the command that is invoked when the user is on the manual schedule page and they click
-# the "Schedule" button at the bottom of the page
+@require_http_methods(["POST"])
 def create_schedule(request):
-    if request.method == 'POST':
-      # 1st turn off all outputs
-      turn_all_zone_outputs_off()
+    """
+         this is the command that is invoked when the user is on the manual schedule page and they click
+         the "Schedule" button at the bottom of the page
+    """
+    response = {}
+    # 1st turn off all outputs
+    turn_all_zone_outputs_off()
         
-      # 2nd cancel any upcoming scheduled requests for today
-      cancel_all_current_requests()
-      
-      # need a list of the zones
-      zone_list = Zone.objects.filter(visible=True, enabled=True)
-      # retrieve the start time from the form field "start_time" and tack on today's date
-      startTime = datetime.strptime(str(date.today()) + ' ' + request.POST['start_time'], "%Y-%m-%d %H:%M")
-      # we need a status object of "New" instantiated
-      new_status = get_object_or_404(Status, pk=1)
-      # now we have to iterate through the table data and put the requests in the database
-      for zone in zone_list:
-          # see if the user has checked the box for the current zone chkZone_1, chkZone_2, etc.
-        if(request.POST.__contains__('chkZone_' + str(zone.zoneId))):
-          endTime = startTime + timedelta(minutes=int(request.POST['duration_'+ str(zone.zoneId)]))
-          rpiGpio = RpiGpio.objects.get(zone=zone)
+    # 2nd cancel any upcoming scheduled requests for today
+    cancel_all_current_requests()
+    json_data = json.loads(request.body.decode('utf-8'))
+
+    #   # need a list of the zones
+    #   zone_list = Zone.objects.filter(visible=True, enabled=True)
+    #   # retrieve the start time from the form field "start_time" and tack on today's date
+    #   startTime = datetime.strptime(str(date.today()) + ' ' + request.POST['start_time'], "%Y-%m-%d %H:%M")
+    #   # we need a status object of "New" instantiated
+    #   new_status = get_object_or_404(Status, pk=1)
+    #   # now we have to iterate through the table data and put the requests in the database
+    #   for zone in zone_list:
+    #       # see if the user has checked the box for the current zone chkZone_1, chkZone_2, etc.
+    #     if(request.POST.__contains__('chkZone_' + str(zone.zoneId))):
+    #       endTime = startTime + timedelta(minutes=int(request.POST['duration_'+ str(zone.zoneId)]))
+    #       rpiGpio = RpiGpio.objects.get(zone=zone)
           
-          # instantiate and fill up an RpiGpioRequest to turn on the zone and save it
-          rpiGpioRequest = RpiGpioRequest.objects.create(rpiGpio=rpiGpio, status=new_status, onDateTime=startTime, offDateTime=endTime)
-          rpiGpioRequest.save()
-          startTime = endTime
+    #       # instantiate and fill up an RpiGpioRequest to turn on the zone and save it
+    #       rpiGpioRequest = RpiGpioRequest.objects.create(rpiGpio=rpiGpio, status=new_status, onDateTime=startTime, offDateTime=endTime)
+    #       rpiGpioRequest.save()
+    #       startTime = endTime
 
-    return HttpResponseRedirect('/')
-
+    # return HttpResponseRedirect('/')
 
 
 def turn_all_outputs_off():
@@ -141,12 +147,13 @@ def cancel_all_current_requests():
     """
     cancelled_status = get_object_or_404(Status, pk=3)
     # retrieve all new requests
-    todays_requests = RpiGpioRequest.objects.filter(status__in=[1], onDateTime__contains=date.today())
+    todays_requests = RpiGpioRequest.todays_requests.all()
 
     # mark them as cancelled
-    for rpiGpioRequest in todays_requests:
-        rpiGpioRequest.status = cancelled_status
-        rpiGpioRequest.save()
+    if todays_requests:
+        for rpi_gpio_request in todays_requests:
+            rpi_gpio_request.status = cancelled_status
+            rpi_gpio_request.save()
 
 
 def rpi_gpio_request_cancel(request, id):
@@ -160,23 +167,84 @@ def rpi_gpio_request_cancel(request, id):
     
 def rpi_gpio_request_cancel_all(request):
     # 1 is pending 4 is active
-    rpiGpioOnRequests = RpiGpioRequest.pending_or_active_requests.all()
+    rpi_gpio_on_requests = RpiGpioRequest.pending_or_active_requests.all()
     cancelled_status = get_object_or_404(Status, pk=3)
     # cancel the ON requests
-    for rpiGpioOnRequest in rpiGpioOnRequests:
-        rpiGpioOnRequest.status = cancelled_status
-        rpiGpioOnRequest.save()
+    for rpi_gpio_on_request in rpi_gpio_on_requests:
+        rpi_gpio_on_request.status = cancelled_status
+        rpi_gpio_on_request.save()
     return HttpResponseRedirect('/')
 
 
 @require_http_methods(["GET"])
-def get_schedule(request, scheduleId):
-    scheduleId = int(scheduleId)
-    schedule = get_object_or_404(Schedule,  pk=scheduleId)
-    queryset = schedule.irrigationschedule_set.all()
-    serializer = IrrigationScheduleSerializer(queryset, many=True)
+def get_schedule(request, scheduleId, startTime):
+    """
+        from the UI, the scheduleId and desired start time are chosen
+        and passed in the URL
+        this function will return the RPi GPIO requests
+    """
 
-    return JsonResponse(serializer.data, safe=False)
+    scheduleId = int(scheduleId)
+    # get the Schedule
+    schedule = Schedule.objects.get(pk=scheduleId)
+
+    # get the 1st IrrigationSchedule associated to this schedule
+    # normally we use the day of the week to filter but we don't 
+    # need to do that in this case since we want the zones, times and
+    # durations only
+    irrigation_schedule = schedule.irrigationschedule_set.first()
+    week_day = irrigation_schedule.weekDays.first()
+    irrigation_schedules = schedule.irrigationschedule_set.filter(weekDays=week_day).order_by('sortOrder')
+
+    # this establishes the current date
+    current_time = datetime.now()
+
+    # need to set current time hour and minute from passed in
+    # startTime
+    startTime = datetime.strptime(startTime, '%H:%M %p')
+
+    # initialize the zone start time - when the whole schedule kicks off
+    # give the passed in start time
+    zone_start_time = datetime(current_time.year, current_time.month,
+                               current_time.day, startTime.hour,
+                               startTime.minute)
+    # used below
+    pending_status = get_object_or_404(Status, pk=1)
+
+    # get the multiplier
+    weather_api = WeatherAPI()
+    sprinkle_smart_multiplier = weather_api.get_sprinkle_smart_multiplier()
+    scheduled_requests = []
+
+    # create RpiGpioRequest records for the start time
+    # there should only be one rpiGpio per zone but it is a set so iterate anyway
+    for irrigation_schedule in irrigation_schedules:
+        rpigpios = irrigation_schedule.zone.rpigpio_set.all()
+
+        for rpigpio in rpigpios:            
+            # instantiate a RpiGpioRequest
+            scheduled_request = RpiGpioRequest()
+            scheduled_request.rpiGpio = rpigpio
+            # set it's start time
+            scheduled_request.onDateTime = zone_start_time
+            
+            # estabilsh the end time
+            duration_seconds = irrigation_schedule.duration * sprinkle_smart_multiplier * 60
+            zone_end_time = zone_start_time + timedelta(0, duration_seconds)
+            
+            scheduled_request.offDateTime = zone_end_time
+            # set the status to pending so it gets picked up
+            scheduled_request.status = pending_status
+            scheduled_request.durationMultiplier = sprinkle_smart_multiplier
+            #scheduled_request.save()
+            # need to append it to an array - not save it
+            zone_start_time = zone_end_time
+            scheduled_requests.append(scheduled_request)
+
+    serializer = RpiGpioRequestSerializer(scheduled_requests, many=True)
+    # zone_list_json = json.dumps(serializer.data)
+    json_data = json.dumps(serializer.data)
+    return JsonResponse(json_data, safe=False)
 
 @require_POST
 def toggle_zone(request):
