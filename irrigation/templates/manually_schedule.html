@@ -48,8 +48,7 @@
 <body>
   {% include "_navigation.html" %}
  
-  <form  action="path/to/server/script" method="post" id="manual_schedule_form">
-    {% csrf_token %}
+  <form  action="/create_schedule/" method="post" id="manual_schedule_form">
     <div class="form-select start-time">
       <input class="timepicker text-center" data-time-format="h:i A">
     </div>
@@ -77,6 +76,7 @@
       </table>
     </div>
     <input type="submit" value="OK">
+    <span class="btn btn-create-schedule">Click me</span>
   </form>
   <!-- end of auto mode content-->
 </body>

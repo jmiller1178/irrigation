@@ -28,9 +28,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# main browser based view for the irrigation website
-# /index.html
+
+@require_http_methods(["GET"])
 def index(request):
+    """
+        main browser based view for the irrigation website
+        index.html
+    """
+    template = 'index.html'
     zones = Zone.objects.filter(enabled=True)
     serializer = ZoneSerializer(zones, many=True)
     zone_list_json = json.dumps(serializer.data)
@@ -59,7 +64,7 @@ def index(request):
     serializer = IrrigationSystemSerializer(irrigation_system, many=False)
     irrigation_system = json.dumps(serializer.data)
 
-    return render(request, 'index.html',
+    return render(request, template,
                         {
                             'irrigation_system': irrigation_system_json,
                             'system_enabled_zone_data' : system_enabled_zone_json,
@@ -69,50 +74,55 @@ def index(request):
                             'current_weather_conditions' : current_weather_conditions_json,
                         })
 
-
-# web browser view invoked when the page for manually scheduling zone activities is loaded
-# /manually_schedule.html
-@ensure_csrf_cookie
+@require_http_methods(["GET"])
 def manually_schedule(request):
+    """
+        web browser view invoked when the page for manually scheduling zone activities is loaded
+        manually_schedule.html
+    """
+    template = 'manually_schedule.html'
     schedules = Schedule.objects.all()
     serializer = ScheduleSerializer(schedules, many=True)    
     schedules_json = json.dumps(serializer.data)
 
-    return render(request, 'manually_schedule.html',
-                        {
-                            'schedules': schedules_json,
-                        })
+    return render(request, template,
+                    {
+                        'schedules': schedules_json,
+                    })
 
-# this is the command that is invoked when the user is on the manual schedule page and they click
-# the "Schedule" button at the bottom of the page
+@require_http_methods(["POST"])
 def create_schedule(request):
-    if request.method == 'POST':
-      # 1st turn off all outputs
-      turn_all_zone_outputs_off()
+    """
+         this is the command that is invoked when the user is on the manual schedule page and they click
+         the "Schedule" button at the bottom of the page
+    """
+    response = {}
+    # 1st turn off all outputs
+    turn_all_zone_outputs_off()
         
-      # 2nd cancel any upcoming scheduled requests for today
-      cancel_all_current_requests()
-      
-      # need a list of the zones
-      zone_list = Zone.objects.filter(visible=True, enabled=True)
-      # retrieve the start time from the form field "start_time" and tack on today's date
-      startTime = datetime.strptime(str(date.today()) + ' ' + request.POST['start_time'], "%Y-%m-%d %H:%M")
-      # we need a status object of "New" instantiated
-      new_status = get_object_or_404(Status, pk=1)
-      # now we have to iterate through the table data and put the requests in the database
-      for zone in zone_list:
-          # see if the user has checked the box for the current zone chkZone_1, chkZone_2, etc.
-        if(request.POST.__contains__('chkZone_' + str(zone.zoneId))):
-          endTime = startTime + timedelta(minutes=int(request.POST['duration_'+ str(zone.zoneId)]))
-          rpiGpio = RpiGpio.objects.get(zone=zone)
+    # 2nd cancel any upcoming scheduled requests for today
+    cancel_all_current_requests()
+    json_data = json.loads(request.body.decode('utf-8'))
+
+    #   # need a list of the zones
+    #   zone_list = Zone.objects.filter(visible=True, enabled=True)
+    #   # retrieve the start time from the form field "start_time" and tack on today's date
+    #   startTime = datetime.strptime(str(date.today()) + ' ' + request.POST['start_time'], "%Y-%m-%d %H:%M")
+    #   # we need a status object of "New" instantiated
+    #   new_status = get_object_or_404(Status, pk=1)
+    #   # now we have to iterate through the table data and put the requests in the database
+    #   for zone in zone_list:
+    #       # see if the user has checked the box for the current zone chkZone_1, chkZone_2, etc.
+    #     if(request.POST.__contains__('chkZone_' + str(zone.zoneId))):
+    #       endTime = startTime + timedelta(minutes=int(request.POST['duration_'+ str(zone.zoneId)]))
+    #       rpiGpio = RpiGpio.objects.get(zone=zone)
           
-          # instantiate and fill up an RpiGpioRequest to turn on the zone and save it
-          rpiGpioRequest = RpiGpioRequest.objects.create(rpiGpio=rpiGpio, status=new_status, onDateTime=startTime, offDateTime=endTime)
-          rpiGpioRequest.save()
-          startTime = endTime
+    #       # instantiate and fill up an RpiGpioRequest to turn on the zone and save it
+    #       rpiGpioRequest = RpiGpioRequest.objects.create(rpiGpio=rpiGpio, status=new_status, onDateTime=startTime, offDateTime=endTime)
+    #       rpiGpioRequest.save()
+    #       startTime = endTime
 
-    return HttpResponseRedirect('/')
-
+    # return HttpResponseRedirect('/')
 
 
 def turn_all_outputs_off():
@@ -137,12 +147,13 @@ def cancel_all_current_requests():
     """
     cancelled_status = get_object_or_404(Status, pk=3)
     # retrieve all new requests
-    todays_requests = RpiGpioRequest.objects.filter(status__in=[1], onDateTime__contains=date.today())
+    todays_requests = RpiGpioRequest.todays_requests.all()
 
     # mark them as cancelled
-    for rpiGpioRequest in todays_requests:
-        rpiGpioRequest.status = cancelled_status
-        rpiGpioRequest.save()
+    if todays_requests:
+        for rpi_gpio_request in todays_requests:
+            rpi_gpio_request.status = cancelled_status
+            rpi_gpio_request.save()
 
 
 def rpi_gpio_request_cancel(request, id):
