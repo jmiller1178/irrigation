@@ -312,6 +312,7 @@ def toggle_zone_request(request):
         # cancel the ON request
         rpi_gpio_on_request.status = cancelled_status
         rpi_gpio_on_request.save()
+        turn_zone_off(zone_id)
     
     serializer = RpiGpioRequestSerializer(rpi_gpio_on_requests, many=True)
 
