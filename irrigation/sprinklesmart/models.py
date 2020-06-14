@@ -239,7 +239,9 @@ class OffRequestsManager(models.Manager):
         match_time = datetime(current_time.year, current_time.month, current_time.day,\
             current_time.hour, current_time.minute, second=0, microsecond=0)
         active_status = get_object_or_404(Status, pk=4) # 4 is active
-        return super().get_queryset().filter(status=active_status, offDateTime=match_time)
+        # we're at the exact moment to turn off the zone or that time has
+        # already passed by
+        return super().get_queryset().filter(status=active_status, offDateTime__lte=match_time)
 
 class PendingRequestsManager(models.Manager):
     def get_queryset(self):
