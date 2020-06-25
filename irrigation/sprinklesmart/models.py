@@ -237,18 +237,18 @@ class OffRequestsManager(models.Manager):
     def get_queryset(self):
         current_time = datetime.now()
         active_status = get_object_or_404(Status, pk=4) # 4 is active
-        return super().get_queryset().filter(status=active_status, offDateTime_year=current_time.year,
-            offDateTime_month=current_time.month, offDateTime_day=current_time.day,
-            offDateTime_hour=current_time.hour, offDateTime_minute=current_time.minute)
+        return super().get_queryset().filter(status=active_status, offDateTime__year=current_time.year,
+            offDateTime__month=current_time.month, offDateTime__day=current_time.day,
+            offDateTime__hour=current_time.hour, offDateTime__minute=current_time.minute)
 
 class PendingRequestsManager(models.Manager):
     def get_queryset(self):
         current_time = datetime.now()
         
         pending_status = get_object_or_404(Status, pk=1) # 1 is pending
-        return super().get_queryset().filter(status=pending_status, onDateTime_year=current_time.year,
-            onDateTime_month=current_time.month, onDateTime_day=current_time.day,
-            onDateTime_hour=current_time.hour, onDateTime_minute=current_time.minute)
+        return super().get_queryset().filter(status=pending_status, onDateTime__year=current_time.year,
+            onDateTime__month=current_time.month, onDateTime__day=current_time.day,
+            onDateTime__hour=current_time.hour, onDateTime__minute=current_time.minute)
             
 
 class PendingOrActiveRequestsManager(models.Manager):
