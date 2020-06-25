@@ -323,19 +323,10 @@ class RpiGpioRequest(models.Model):
         """
         on duration
         """
-        # duration = (self.offDateTime - self.onDateTime).seconds / 60
 
-        # ontime 18:30
-        # offtime 18:45
-        off_hour = self.offDateTime.hour # 18
-        off_minute = self.offDateTime.minute # 45
-        on_hour = self.onDateTime.hour # 18
-        on_minute = self.onDateTime.minute # 30
-
-        off_minutes = off_hour * 60 + off_minute # 1080 + 45 = 1125
-        on_minutes = on_hour * 60 + on_minute # 1080 + 30 = 1110
-
-        duration = off_minutes - on_minutes
+        duration = self.offDateTime - self.onDateTime
+        duration_in_s = duration.total_seconds()
+        duration = divmod(duration_in_s, 60)[0]
         return duration
 
     @property
@@ -344,18 +335,14 @@ class RpiGpioRequest(models.Model):
         remaining time for this scheduled request
         """
         current_time = datetime.now()
-        current_hour = current_time.hour
-        current_minute = current_time.minute
-        current_minutes = current_hour * 60 + current_minute
-
-        off_hour = self.offDateTime.hour # 18
-        off_minute = self.offDateTime.minute # 45
-        off_minutes = off_hour * 60 + off_minute # 1080 + 45 = 1125
 
         remaining = 0
 
-        if off_minutes > current_minutes:
-            remaining = off_minutes - current_minutes
+        if self.offDateTime > current_time:
+            remaining = self.offDateTime - current_time
+            remaining_in_s = remaining.total_seconds()    
+            remaining = divmod(remaining_in_s, 60)[0] 
+            
 
         if remaining > self.duration:
             remaining = self.duration
