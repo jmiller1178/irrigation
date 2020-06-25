@@ -229,8 +229,8 @@ def get_schedule(request, scheduleId, startTime):
             scheduled_request.onDateTime = zone_start_time
             
             # estabilsh the end time
-            duration_seconds = irrigation_schedule.duration * sprinkle_smart_multiplier * 60
-            zone_end_time = zone_start_time + timedelta(0, duration_seconds)
+            duration_minutes = int(irrigation_schedule.duration * sprinkle_smart_multiplier)
+            zone_end_time = zone_start_time + timedelta(minutes=duration_minutes)
             
             scheduled_request.offDateTime = zone_end_time
             # set the status to pending so it gets picked up
