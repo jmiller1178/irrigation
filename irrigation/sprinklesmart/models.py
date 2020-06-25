@@ -236,18 +236,20 @@ class TodaysRpiGpioRequestManager(models.Manager):
 class OffRequestsManager(models.Manager):
     def get_queryset(self):
         current_time = datetime.now()
-        match_time = datetime(current_time.year, current_time.month, current_time.day,\
-            current_time.hour, current_time.minute, second=0, microsecond=0)
         active_status = get_object_or_404(Status, pk=4) # 4 is active
-        return super().get_queryset().filter(status=active_status, offDateTime=match_time)
+        return super().get_queryset().filter(status=active_status, offDateTime_year=current_time.year,
+            offDateTime_month=current_time.month, offDateTime_day=current_time.day,
+            offDateTime_hour=current_time.hour, offDateTime_minute=current_time.minute)
 
 class PendingRequestsManager(models.Manager):
     def get_queryset(self):
         current_time = datetime.now()
-        match_time = datetime(current_time.year, current_time.month, current_time.day, current_time.hour, current_time.minute, second=0, microsecond=0)
+        
         pending_status = get_object_or_404(Status, pk=1) # 1 is pending
-        return super().get_queryset().filter(status=pending_status,
-            onDateTime=match_time)
+        return super().get_queryset().filter(status=pending_status, onDateTime_year=current_time.year,
+            onDateTime_month=current_time.month, onDateTime_day=current_time.day,
+            onDateTime_hour=current_time.hour, onDateTime_minute=current_time.minute)
+            
 
 class PendingOrActiveRequestsManager(models.Manager):
     def get_queryset(self):
