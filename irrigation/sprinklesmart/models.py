@@ -344,13 +344,22 @@ class RpiGpioRequest(models.Model):
         remaining time for this scheduled request
         """
         current_time = datetime.now()
-       
-        if datetime.now() > self.offDateTime:
-            remaining = 0
-        elif datetime.now() > self.onDateTime:
-          remaining = ((self.offDateTime - datetime.now()).seconds / 60) + 1
-        else:
-          remaining =(self.offDateTime - self.onDateTime).seconds / 60
+        current_hour = current_time.hour
+        current_minute = current_time.minute
+        current_minutes = current_hour * 60 + current_minute
+
+        off_hour = self.offDateTime.hour # 18
+        off_minute = self.offDateTime.minute # 45
+        off_minutes = off_hour * 60 + off_minute # 1080 + 45 = 1125
+
+        remaining = 0
+
+        if off_minutes > current_minutes:
+            remaining = off_minutes - current_minutes
+
+        if remaining > self.duration:
+            remaining = self.duration
+
         return remaining
 
     @property
