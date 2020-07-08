@@ -65,17 +65,22 @@ class Command(BaseCommand):
                                 rpigpios = irrigation_schedule.zone.rpigpio_set.all()
                             
                                 for rpigpio in rpigpios:            
-                                    scheduled_request = RpiGpioRequest()
-                                    scheduled_request.rpiGpio = rpigpio
-                                    scheduled_request.onDateTime = zone_start_time
+                                    # check for an existing RpiGpioRequest to avoid
+                                    # double scheduling
                                     
-                                    duration_minutes = int(irrigation_schedule.duration * sprinkle_smart_multiplier)
-                                    zone_end_time = zone_start_time + timedelta(minutes=duration_minutes)
+                                    rpi_gpio_request = RpiGpioRequest.todays_requests.filter(rpiGpio=rpigpio)
+                                    if rpi_gpio_request.count() == 0:
+                                        scheduled_request = RpiGpioRequest()
+                                        scheduled_request.rpiGpio = rpigpio
+                                        scheduled_request.onDateTime = zone_start_time
                                     
-                                    scheduled_request.offDateTime = zone_end_time
-                                    scheduled_request.status = pending_status
-                                    scheduled_request.durationMultiplier = sprinkle_smart_multiplier
-                                    scheduled_request.save()
-                                    zone_start_time = zone_end_time
+                                        duration_minutes = int(irrigation_schedule.duration * sprinkle_smart_multiplier)
+                                        zone_end_time = zone_start_time + timedelta(minutes=duration_minutes)
+                                    
+                                        scheduled_request.offDateTime = zone_end_time
+                                        scheduled_request.status = pending_status
+                                        scheduled_request.durationMultiplier = sprinkle_smart_multiplier
+                                        scheduled_request.save()
+                                        zone_start_time = zone_end_time
     
     
