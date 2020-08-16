@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
