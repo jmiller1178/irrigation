@@ -148,7 +148,7 @@ class IrrigationSystem(models.Model):
             
                 # look for active schedule(s) with a start time within the next hour
                 enabled_schedules = Schedule.objects.filter(enabled=True)
-                sprinkle_smart_multiplier = weather_api.get_sprinkle_smart_multiplier()
+                sprinkle_smart_multiplier = self.get_sprinkle_smart_multiplier()
             
                 # retrieve IrrigationSchedule records for this day of the week and for the above Schedule
                 current_time = datetime.now()

@@ -212,8 +212,8 @@ def get_schedule(request, scheduleId, startTime):
     pending_status = get_object_or_404(Status, pk=1)
 
     # get the multiplier
-    weather_api = WeatherAPI()
-    sprinkle_smart_multiplier = weather_api.get_sprinkle_smart_multiplier()
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
+    sprinkle_smart_multiplier = irrigation_system.get_sprinkle_smart_multiplier()
     scheduled_requests = []
 
     # create RpiGpioRequest records for the start time
