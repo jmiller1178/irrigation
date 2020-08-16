@@ -21,66 +21,6 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         irrigation_system = IrrigationSystem.objects.get(pk=1)
-        
-        # are we in automatic mode and the system enabled
-        if irrigation_system.system_mode.automatic_mode and\
-            irrigation_system.systemState:
-
-            # active_status = get_object_or_404(Status, pk=4) # 4 is active
-            pending_status = get_object_or_404(Status, pk=1) # 1 is pending
-
-            # Let's start by checking if ANYTHING is scheduled for today because, if there is, then we shouldn't
-            # have to execute any of the code below, right??
-            requests = RpiGpioRequest.pending_requests.all()
-        
-            if requests.count() == 0:
-                weather_api = WeatherAPI()
-                # there is nothing scheduled for today so do the scheduling process
-            
-                # look for active schedule(s) with a start time within the next hour
-                enabled_schedules = Schedule.objects.filter(enabled=True)
-                sprinkle_smart_multiplier = weather_api.get_sprinkle_smart_multiplier()
-            
-                # retrieve IrrigationSchedule records for this day of the week and for the above Schedule
-                current_time = datetime.now()
-
-                # find the WeekDay object for today
-                week_day = get_object_or_404(WeekDay, weekDay=current_time.weekday())
-            
-                for schedule in enabled_schedules:
-                
-                    schedule_time = datetime(current_time.year, current_time.month, current_time.day, schedule.startTime.hour, schedule.startTime.minute)
-                    if schedule_time > current_time:
-                        delta_time = schedule_time-current_time
-                        minutes_in_future = int(delta_time.seconds / 60)
-                    
-                        if minutes_in_future < 480:
-                            # we're less than 8 hours away from scheduled start time so need to stup the RpiGpioRequests per that schedule
-                            irrigation_schedules = schedule.irrigationschedule_set.filter(weekDays=week_day).order_by('sortOrder')
-                            zone_start_time = datetime(current_time.year, current_time.month, current_time.day, schedule.startTime.hour, schedule.startTime.minute)
-
-                            for irrigation_schedule in irrigation_schedules:
-                                # create RpiGpioRequest records for today
-                                # there should only be one rpiGpio per zone but it is a set so iterate anyway
-                                rpigpios = irrigation_schedule.zone.rpigpio_set.all()
-                            
-                                for rpigpio in rpigpios:            
-                                    # check for an existing RpiGpioRequest to avoid
-                                    # double scheduling
-                                    
-                                    rpi_gpio_request = RpiGpioRequest.todays_requests.filter(rpiGpio=rpigpio)
-                                    if rpi_gpio_request.count() == 0:
-                                        scheduled_request = RpiGpioRequest()
-                                        scheduled_request.rpiGpio = rpigpio
-                                        scheduled_request.onDateTime = zone_start_time
-                                    
-                                        duration_minutes = int(irrigation_schedule.duration * sprinkle_smart_multiplier)
-                                        zone_end_time = zone_start_time + timedelta(minutes=duration_minutes)
-                                    
-                                        scheduled_request.offDateTime = zone_end_time
-                                        scheduled_request.status = pending_status
-                                        scheduled_request.durationMultiplier = sprinkle_smart_multiplier
-                                        scheduled_request.save()
-                                        zone_start_time = zone_end_time
+        irrigation_system.schedule_irrigation_controller()        
     
     
