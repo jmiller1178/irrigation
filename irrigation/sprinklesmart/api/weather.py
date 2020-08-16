@@ -105,19 +105,4 @@ class WeatherAPI(object):
         
         return current_weather_conditions
         
-    def get_sprinkle_smart_multiplier(self):
-        multiplier = 1.0
-    
-        weather_conditions = sprinklesmart.models.WeatherCondition.objects.filter(conditionDateTime__gt=datetime.now()-timedelta(days=2))
-        total_count = weather_conditions.count()
-        rain_count = 0
-    
-        for weather_condition in weather_conditions:
-            if weather_condition.conditionCode.IsRaining:
-                rain_count = rain_count + 1
-    
-        if total_count > 0:
-            multiplier = 1.0 - rain_count / total_count
-
-        return multiplier
 

@@ -192,6 +192,23 @@ class IrrigationSystem(models.Model):
                                         scheduled_request.save()
                                         zone_start_time = zone_end_time
 
+    def get_sprinkle_smart_multiplier(self):
+        multiplier = 1.0
+    
+        weather_conditions = WeatherCondition.objects.filter(conditionDateTime__gt=datetime.now()-timedelta(days=2))
+        total_count = weather_conditions.count()
+        rain_count = 0
+    
+        for weather_condition in weather_conditions:
+            if weather_condition.conditionCode.IsRaining:
+                rain_count = rain_count + 1
+    
+        if total_count > 0:
+            multiplier = 1.0 - rain_count / total_count
+
+        return multiplier
+
+
 class Status(models.Model):
     """
     Status is used to represent various states that the RPi GPIO requests go through
