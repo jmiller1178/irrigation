@@ -1,6 +1,6 @@
 import json
 from .models import (Zone, IrrigationSystem, RpiGpio, WeatherCondition,
-    RpiGpioRequest)
+    RpiGpioRequest, Schedule)
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import IntegrityError
@@ -59,6 +59,9 @@ def post_save_irrigation_system(sender, instance, *args, **kwargs):
     rabbit_mq_api.publish(exchange=EXCHANGE,
                           routing_key=routing_key,
                           body=body)
+    # trigger a schedule irrigation controller invocation
+    irrigation_system.schedule_irrigation_controller()        
+
 
 @receiver(post_save, sender=WeatherCondition)
 def post_save_weather_conditions(sender, instance, *args, **kwargs):
@@ -105,3 +108,14 @@ def post_save_rpi_gpio_request(sender, instance, *args, **kwargs):
         rabbit_mq_api.publish(exchange=EXCHANGE,
                           routing_key=routing_key,
                           body=body)
+
+
+@receiver(post_save, sender=Schedule)
+def post_save_schedule(sender, instance, *args, **kwargs):
+    """
+    post save Schedule
+    """
+    # force an update of the schedule upon saving 
+    irrigation_system = IrrigationSystem.objects.get(pk=1)
+    irrigation_system.schedule_irrigation_controller()        
+
