@@ -4,6 +4,7 @@ from datetime import datetime, date
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from sprinklesmart.api.weather import WeatherAPI
 
 class Zone(models.Model):
     """
