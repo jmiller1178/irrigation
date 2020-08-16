@@ -128,6 +128,7 @@ class IrrigationSystem(models.Model):
 
         self.system_mode = system_mode
         self.save()
+        self.schedule_irrigation_controller()
         return self
 
     def schedule_irrigation_controller(self):
@@ -143,9 +144,7 @@ class IrrigationSystem(models.Model):
             requests = RpiGpioRequest.pending_requests.all()
         
             if requests.count() == 0:
-                weather_api = WeatherAPI()
                 # there is nothing scheduled for today so do the scheduling process
-            
                 # look for active schedule(s) with a start time within the next hour
                 enabled_schedules = Schedule.objects.filter(enabled=True)
                 sprinkle_smart_multiplier = self.get_sprinkle_smart_multiplier()
@@ -228,6 +227,7 @@ class Status(models.Model):
     def __str__(self):
         return self.displayName
 
+
 class WeekDay(models.Model):
     """
     WeekDay is a day of the week
@@ -244,6 +244,7 @@ class WeekDay(models.Model):
 
     def __str__(self):
         return self.shortName
+
 
 class Schedule(models.Model):
     """ 

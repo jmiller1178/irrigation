@@ -31,7 +31,6 @@ def post_save_zone(sender, instance, *args, **kwargs):
                             settings.RABBITMQ_USERNAME,
                             settings.RABBITMQ_PASSWORD)
 
-
     rabbit_mq_api.publish(exchange=EXCHANGE,
                         routing_key=routing_key,
                         body=body)
