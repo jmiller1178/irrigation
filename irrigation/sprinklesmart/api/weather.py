@@ -11,7 +11,7 @@ import hmac, hashlib
 from base64 import b64encode
 from yahoo_weather.weather import YahooWeather
 from yahoo_weather.config.units import Unit
-from sprinklesmart.models import WeatherCondition
+
 
 logger = logging.getLogger(__name__)
 
@@ -108,7 +108,7 @@ class WeatherAPI(object):
     def get_sprinkle_smart_multiplier(self):
         multiplier = 1.0
     
-        weather_conditions = WeatherCondition.objects.filter(conditionDateTime__gt=datetime.now()-timedelta(days=2))
+        weather_conditions = sprinklesmart.models.WeatherCondition.objects.filter(conditionDateTime__gt=datetime.now()-timedelta(days=2))
         total_count = weather_conditions.count()
         rain_count = 0
     
