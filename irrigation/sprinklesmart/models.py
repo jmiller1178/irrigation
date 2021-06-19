@@ -162,7 +162,7 @@ class IrrigationSystem(models.Model):
                         delta_time = schedule_time-current_time
                         minutes_in_future = int(delta_time.seconds / 60)
                     
-                        if minutes_in_future < 480:
+                        if minutes_in_future < 4800:
                             # we're less than 8 hours away from scheduled start time so need to stup the RpiGpioRequests per that schedule
                             irrigation_schedules = schedule.irrigationschedule_set.filter(weekDays=week_day).order_by('sortOrder')
                             zone_start_time = datetime(current_time.year, current_time.month, current_time.day, schedule.startTime.hour, schedule.startTime.minute)
