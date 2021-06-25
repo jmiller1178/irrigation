@@ -186,6 +186,9 @@ WEATHER_APP_ID = 'RM92pQ50'
 WEATHER_CONSUMER_KEY = 'dj0yJmk9YWxGUmNERE8yY3ZPJmQ9WVdrOVVrMDVNbkJSTlRBbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWZk'
 WEATHER_CONSUMER_SECRET = '10f18a7036102224a29c5a8c9404920ae5594311'
 
+WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather?zip=49426,US&units=imperial&appid=WEATHER_KEY'
+WEATHER_KEY = '905d4cb6e09a61646cba2f02ce6b1a65'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

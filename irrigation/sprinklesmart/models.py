@@ -480,8 +480,10 @@ class ConditionCode(models.Model):
         """
         codes for raining - returns true if match
         """
-        return self.code in (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 
-        12, 13, 17, 18, 35, 37, 38, 39, 40, 45, 47)
+        is_raining = False
+        
+        is_raining = self.code >= 200 and self.code < 532
+        return is_raining
 
     class Meta:
         db_table = "conditionCode"

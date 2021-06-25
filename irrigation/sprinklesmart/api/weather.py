@@ -11,7 +11,7 @@ import hmac, hashlib
 from base64 import b64encode
 from yahoo_weather.weather import YahooWeather
 from yahoo_weather.config.units import Unit
-
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +20,7 @@ class WeatherAPI(object):
         """
         Basic info
         """
-        # url = settings.WEATHER_URL
-        # method = 'GET'
+        
         app_id = settings.WEATHER_APP_ID
         consumer_key = settings.WEATHER_CONSUMER_KEY
         consumer_secret = settings.WEATHER_CONSUMER_SECRET
@@ -33,14 +32,41 @@ class WeatherAPI(object):
         data.get_yahoo_weather_by_city("hudsonville,mi", Unit.fahrenheit)
         
         return data
+        
+    def get_weather_from_openweathermap(self):
+        # api.openweathermap.org/data/2.5/weather?zip=49426,US&units=imperial&appid=905d4cb6e09a61646cba2f02ce6b1a65
+        url = settings.WEATHER_URL.replace('WEATHER_KEY',  settings.WEATHER_KEY)
+        weather_response = requests.get(url).json()
+
+        current_observation_date =datetime.utcfromtimestamp(weather_response['dt']) 
+        city = weather_response['name']
+        state = 'MI'
+        title = "Conditions for {0},{1} at {2}".format(city, state, current_observation_date)
+                
+        weather_code = int(weather_response['weather'][0]['id'])
+        
+        temperature = weather_response['main']['temp']
+        uom = 'F'
+        conditions = weather_response['weather'][0]['main']
+
+        current_weather_conditions = {}
+        current_weather_conditions['condition_date_time'] = current_observation_date
+        current_weather_conditions['temperature'] = temperature
+        current_weather_conditions['uom'] = uom
+        current_weather_conditions['weather_code'] = weather_code
+        current_weather_conditions['title'] = title
+        current_weather_conditions['conditions'] = conditions
+        return current_weather_conditions
+       
 
     # 7/9/2019 rewritten to use JSON service which requires OAUTH - stupid yahoo
     def read_current_weather_conditions(self):
         #response = self.get_weather_from_yahoo()
 
         #jsonResponse = json.loads(response.decode('utf-8'))
-        weather_data = self.get_weather_from_yahoo()
-
+        # weather_data = self.get_weather_from_yahoo()
+        weather_data = self.get_weather_from_openweathermap()
+        
         current_observation_date = weather_data.current_observation.pubDate
 
         city = weather_data.location.city
